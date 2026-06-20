@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
@@ -96,7 +96,8 @@ export class ProdutoComponent implements OnInit, OnDestroy {
     private confirmationService: ConfirmationService,
     private unidadeService: UnidadeMedidaService,
     private marcaService: MarcaService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private cd:ChangeDetectorRef
   ) { 
     this.produtoForm = this.formBuilderProduto.group({
     codigo: [{ value: null as bigint | null, disabled: true }],
@@ -633,6 +634,7 @@ export class ProdutoComponent implements OnInit, OnDestroy {
         next: (response) => {
           if (response) {
             this.produtoDatas = response;
+            this.cd.detectChanges()
           }
         },
         error: (error) => {

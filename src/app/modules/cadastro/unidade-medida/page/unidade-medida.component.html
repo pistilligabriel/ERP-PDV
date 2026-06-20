@@ -113,14 +113,18 @@
                   </p-multiSelect>
 
                   <span class="p-input-icon-left ml-auto mr-2">
-                    <i class="pi pi-search"></i>
-                    <input
-                      pInputText
-                      type="text"
-                      [(ngModel)]="valorPesquisa"
-                      (input)="applyFilterGlobal($event, 'contains')"
-                      placeholder="Pesquisar"
-                    />
+                    <p-inputgroup>
+                       <p-inputgroup-addon class="cursor-pointer">
+                      <i class="pi pi-search"></i>
+                      </p-inputgroup-addon>
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="valorPesquisa"
+                        (input)="applyFilterGlobal($event, 'contains')"
+                        placeholder="Pesquisar"
+                      />
+                    </p-inputgroup>
                   </span>
                   <button
                     pButton

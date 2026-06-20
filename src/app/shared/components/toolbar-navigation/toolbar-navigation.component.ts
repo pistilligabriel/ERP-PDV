@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { MenuItem } from 'primeng/api';
@@ -18,16 +18,15 @@ import { VendaDialogService } from '../../../services/faturamento/venda/VendaDia
   styleUrls: ['./toolbar-navigation.component.css'],
 })
 export class ToolbarNavigationComponent implements OnInit, OnDestroy {
-  
   goHome() {
-    this.router.navigate(['/home'])
+    this.router.navigate(['/home']);
   }
 
   private destroy$: Subject<void> = new Subject<void>();
 
-  logo!: File | string;
+  logo: File | string = 'assets/default-logo.png';
 
-  nomeEmpresa!: string;
+  nomeEmpresa: string = '';
 
   infoConfig!: Config;
 
@@ -41,7 +40,8 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private usuarioContext: UsuarioContextService,
     private configService: ConfigurationService,
-    private vendaDialogService: VendaDialogService
+    private vendaDialogService: VendaDialogService,
+    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -132,19 +132,33 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
       },
     ];
 
-    this.configService.empresa$.subscribe((config) => {
-      if (config) {
-        this.nomeEmpresa = config.nomeEmpresa;
-        this.logo = config.logo || 'assets/default-logo.png';
-      } else {
-        this.getNomeEmpresa();
-        this.obterInformacoes();
-      }
+    this.configService.empresa$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (config) => {
+        if (config) {
+          this.nomeEmpresa = config.nomeEmpresa;
+
+          if (config.logo) {
+            this.logo = config.logo;
+          } else {
+            this.obterInformacoes();
+          }
+        } else {
+          this.getNomeEmpresa();
+          this.obterInformacoes();
+        }
+
+        this.cd.detectChanges();
+      },
     });
 
-    this.usuarioContext.getUsuario().subscribe((usuario) => {
-      this.usuarioLogado = usuario;
-    });
+    this.usuarioContext
+      .getUsuario()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (usuario) => {
+          this.usuarioLogado = usuario;
+        },
+      });
   }
 
   venda() {
@@ -187,28 +201,80 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
     window.location.href = '/login';
   }
 
-  getNomeEmpresa() {
-    this.configService.getConfig().subscribe((config) => {
-      this.nomeEmpresa = config.nomeEmpresa;
+getNomeEmpresa(): void {
+
+  this.configService.getConfig()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (config) => {
+
+        this.nomeEmpresa = config.nomeEmpresa;
+
+        this.cd.detectChanges();
+
+      },
+      error: (error) => {
+
+        console.error(
+          'Erro ao buscar configuração da empresa',
+          error
+        );
+
+      }
     });
-  }
+
+}
 
   obterInformacoes(): void {
-    this.configService.getLogo().subscribe(
-      (blob) => {
-        console.log('Blob recebido:', blob);
+
+  this.configService.getLogo()
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+
+      next: (blob) => {
+
         const reader = new FileReader();
+
+
         reader.onload = () => {
+
           this.logo = reader.result as string;
+
+          this.cd.detectChanges();
+
         };
+
+
+        reader.onerror = () => {
+
+          this.logo = 'assets/default-logo.png';
+
+          this.cd.detectChanges();
+
+        };
+
+
         reader.readAsDataURL(blob);
+
       },
-      (error) => {
-        console.error('Erro ao carregar logo', error);
+
+
+      error: (error) => {
+
+        console.error(
+          'Erro ao carregar logo',
+          error
+        );
+
         this.logo = 'assets/default-logo.png';
+
+        this.cd.detectChanges();
+
       }
-    );
-  }
+
+    });
+
+}
 
   ngOnDestroy(): void {
     this.destroy$.next();

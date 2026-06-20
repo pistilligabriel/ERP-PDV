@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -84,6 +84,7 @@ export class ClienteComponent implements OnInit {
     private router: Router,
     private formBuilderCliente: FormBuilder,
     private confirmationService: ConfirmationService,
+    private cd:ChangeDetectorRef
   ) {
     /**
      * Formulário reativo para adicionar/editar clientes.
@@ -198,7 +199,7 @@ export class ClienteComponent implements OnInit {
       case 'DESATIVADO':
         return 'danger';
       default:
-        return ''; // Add a default case that returns a default value
+        return
     }
   }
 
@@ -375,6 +376,7 @@ export class ClienteComponent implements OnInit {
         next: (response) => {
           if (response) {
             this.clienteDatas = response;
+            this.cd.detectChanges()
           }
         },
         error: (error) => {

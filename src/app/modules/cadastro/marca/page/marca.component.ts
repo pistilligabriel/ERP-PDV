@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -75,6 +75,7 @@ export class MarcaComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilderMarca: FormBuilder,
     private confirmationService: ConfirmationService,
+    private cd:ChangeDetectorRef
   ) {
     /**
    * Formulário reativo para adicionar/editar grupos de usuários.
@@ -308,6 +309,7 @@ export class MarcaComponent implements OnInit, OnDestroy {
         next: (response) => {
           if (response) {
             this.marcaDatas = response;
+            this.cd.detectChanges()
           }
         },
         error: (error) => {

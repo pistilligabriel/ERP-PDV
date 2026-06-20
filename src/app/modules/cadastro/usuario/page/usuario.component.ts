@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
@@ -110,6 +110,7 @@ export class UsuarioComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilderUser: FormBuilder,
     private confirmationService: ConfirmationService,
+    private cd:ChangeDetectorRef
   ) { 
      /**
    * Formulário reativo para adicionar/editar grupos de usuários.
@@ -379,6 +380,7 @@ export class UsuarioComponent implements OnInit, OnDestroy {
         next: (response) => {
           if (response) {
             this.userDatas = response;
+            this.cd.detectChanges()
           }
         },
         error: (error) => {

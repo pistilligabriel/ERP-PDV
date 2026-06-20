@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { format } from 'date-fns';
@@ -88,6 +88,7 @@ export class UnidadeMedidaComponent implements OnInit, OnDestroy {
     private router: Router,
     private formBuilderUnidade: FormBuilder,
     private confirmationService: ConfirmationService,
+    private cd:ChangeDetectorRef
   ) { 
     this.unidadeForm = this.formBuilderUnidade.group({
     codigo: [{value: null as bigint | null, disabled: true}],
@@ -336,6 +337,7 @@ visualizarUnidade(unidade:UnidadeMedida){
         next: (response) => {
           if (response) {
             this.unidadeDatas = response;
+            this.cd.detectChanges()
           }
         },
         error: (error) => {

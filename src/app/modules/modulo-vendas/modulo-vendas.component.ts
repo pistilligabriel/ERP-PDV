@@ -1,7 +1,6 @@
-
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { ContextMenu } from 'primeng/contextmenu';
@@ -22,12 +21,11 @@ import { VendaDialogService } from '../../services/faturamento/venda/VendaDialog
 import { ConfigurationService } from '../../services/configuration/configuration.service';
 import { ItemVendaResponseDto } from '../../models/Interfaces/pedido/ItemVendaResponseDto.interface';
 
-
 registerLocaleData(localePt, 'pt-BR');
 
 @Component({
   selector: 'app-modulo-vendas',
-  standalone:false,
+  standalone: false,
   templateUrl: './modulo-vendas.component.html',
   styleUrls: ['./modulo-vendas.component.css'],
 })
@@ -35,10 +33,9 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
   items: MenuItem[] | undefined;
 
   // Informações do usuário logado
-  usuario!: Usuario | null;
+  usuario: Usuario | null = null;
 
-  empresa!: Config;
-
+  empresa: Config | null = null;
 
   private destroy$: Subject<void> = new Subject<void>();
 
@@ -94,11 +91,11 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
     this.listarVendas();
   }
 
-  cols!: Column[];
+  cols: Column[] = [];
 
-  colunasSelecionadas!: Column[];
+  colunasSelecionadas: Column[] = [];
 
-  exportColumns!: ExportColumn[];
+  exportColumns: ExportColumn[] = [];
 
   constructor(
     private vendaService: VendaService,
@@ -109,22 +106,20 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
     private vendaContext: VendaContextService,
     private vendaDialogService: VendaDialogService,
     private configService: ConfigurationService,
+    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit() {
-    this.vendaDialogService.abrirDialog$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.abrirDialogTipoVenda();
-      });
-
-    this.listarVendas();
+    this.vendaDialogService.abrirDialog$.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.abrirDialogTipoVenda();
+    });
 
     this.usuarioContext.getUsuario().subscribe({
       next: (usuario) => {
         this.usuario = usuario;
         console.log(this.usuario);
         this.inicializarColunas();
+        this.listarVendas();
       },
       error: (e) => {
         console.log('Não foi possível obter o usuário logado', e);
@@ -136,15 +131,18 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
       console.log('verificação token');
       return;
     }
-    
-    this.configService.getConfig().pipe(takeUntil(this.destroy$)).subscribe({
-      next: (config) => {
-        this.empresa = config;
-      },
-      error: (e) => {
-        console.log('Não foi possível obter a configuração da empresa', e);
-      },
-    });
+
+    this.configService
+      .getConfig()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (config) => {
+          this.empresa = config;
+        },
+        error: (e) => {
+          console.log('Não foi possível obter a configuração da empresa', e);
+        },
+      });
   }
 
   private inicializarColunas() {
@@ -231,10 +229,7 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
    * @param stringVal O valor da string para filtrar.
    */
   applyFilterGlobal($event: any, stringVal: any) {
-    this.tabelaVenda!.filterGlobal(
-      ($event.target as HTMLInputElement).value,
-      stringVal,
-    );
+    this.tabelaVenda!.filterGlobal(($event.target as HTMLInputElement).value, stringVal);
   }
 
   /**
@@ -413,6 +408,7 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
         next: (response) => {
           if (response) {
             this.vendasDatas = response;
+            this.cd.detectChanges();
             console.log('Vendas carregadas:', this.vendasDatas);
           }
         },

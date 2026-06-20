@@ -12,40 +12,42 @@ import { ResponseModuloVendaDto } from '../../../models/Interfaces/pedido/Respon
 })
 export class VendaService {
   private API_URL = environment.apiUrl;
-  private JWT_TOKEN = '';
-  private httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.JWT_TOKEN}`,
-    }),
-  };
+
+  private getHttpOptions(){
+    const token = this.cookie.get('token')
+    
+    return {
+      headers: new HttpHeaders({
+        'Content-Type':'application/json',
+        Authorization: `Bearer ${token}` 
+      })
+    }
+  }
 
   constructor(
     private http: HttpClient,
     private cookie: CookieService,
-  ) {
-    this.JWT_TOKEN = this.cookie.get('token');
-  }
+  ) {  }
 
   criarPedido(requestVenda: PedidoDto): Observable<Array<PedidoDto>> {
     return this.http.post<Array<PedidoDto>>(
       `${this.API_URL}/pedidos`,
       requestVenda,
-      this.httpOptions,
+      this.getHttpOptions(),
     );
   }
 
   getAllVendas(): Observable<Array<ResponseModuloVendaDto>> {
     return this.http.get<Array<ResponseModuloVendaDto>>(
       `${this.API_URL}/pedidos`,
-      this.httpOptions,
+      this.getHttpOptions(),
     );
   }
 
   cancelarVenda(codigo: bigint): Observable<Array<PedidoDto>> {
     return this.http.post<Array<PedidoDto>>(
       `${this.API_URL}/pedidos/cancelar/${codigo}`,
-      this.httpOptions,
+      this.getHttpOptions(),
     );
   }
 

@@ -13,38 +13,41 @@ import { EditarUnidade } from '../../../models/Interfaces/cadastro/unidade-medid
 })
 export class UnidadeMedidaService {
 private API_URL = environment.apiUrl;
-private JWT_TOKEN = ''
-private httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${this.JWT_TOKEN}`,
-  }),
-};
+
+private getHttpOptions(){
+    const token = this.cookie.get('token')
+    
+    return {
+      headers: new HttpHeaders({
+        'Content-Type':'application/json',
+        Authorization: `Bearer ${token}` 
+      })
+    }
+  }
 
 constructor(
   private http: HttpClient,
   private cookie: CookieService
 ) { 
-  this.JWT_TOKEN = this.cookie.get('token');
 }
 
   addUnidade(unidade: AdicionarUnidade):Observable<Array<UnidadeMedida>>{
-    return this.http.post<Array<UnidadeMedida>>(`${this.API_URL}/unidade-medida`,unidade,this.httpOptions)
+    return this.http.post<Array<UnidadeMedida>>(`${this.API_URL}/unidade-medida`,unidade,this.getHttpOptions())
   }
   
   editUnidade(requestData:EditarUnidade):Observable<UnidadeMedida>{
-    return this.http.put<UnidadeMedida>(`${this.API_URL}/unidade-medida`,requestData,this.httpOptions)
+    return this.http.put<UnidadeMedida>(`${this.API_URL}/unidade-medida`,requestData,this.getHttpOptions())
   }
 
   desativarUnidade(codigo:bigint):Observable<UnidadeMedida>{
-  return this.http.post<UnidadeMedida>(`${this.API_URL}/unidade-medida/alterar-status/${codigo}`, this.httpOptions);
+  return this.http.post<UnidadeMedida>(`${this.API_URL}/unidade-medida/alterar-status/${codigo}`, this.getHttpOptions());
  }
 
  getAllUnidades():Observable<Array<UnidadeMedida>>{
-  return this.http.get<Array<UnidadeMedida>>(`${this.API_URL}/unidade-medida`, this.httpOptions);
+  return this.http.get<Array<UnidadeMedida>>(`${this.API_URL}/unidade-medida`, this.getHttpOptions());
  }
 
   getUnidadeEspecifica(codigo: bigint):Observable<UnidadeMedida>{
-  return this.http.get<UnidadeMedida>(`${this.API_URL}/unidade-medida/${codigo}`, this.httpOptions);
+  return this.http.get<UnidadeMedida>(`${this.API_URL}/unidade-medida/${codigo}`, this.getHttpOptions());
  }
 }

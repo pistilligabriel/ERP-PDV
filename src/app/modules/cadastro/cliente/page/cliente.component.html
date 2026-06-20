@@ -67,9 +67,18 @@
                   </p-multiSelect>
 
                   <span class="p-input-icon-left ml-auto mr-2">
-                    <i class="pi pi-search"></i>
-                    <input pInputText type="text" [(ngModel)]="valorPesquisa"
-                      (input)="applyFilterGlobal($event, 'contains')" placeholder="Pesquisar" />
+                    <p-inputgroup>
+                       <p-inputgroup-addon class=" cursor-pointer">
+                      <i class="pi pi-search"></i>
+                      </p-inputgroup-addon>
+                      <input
+                        pInputText
+                        type="text"
+                        [(ngModel)]="valorPesquisa"
+                        (input)="applyFilterGlobal($event, 'contains')"
+                        placeholder="Pesquisar"
+                      />
+                    </p-inputgroup>
                   </span>
                   <button pButton label="Limpar" class="p-button-outlined" icon="pi pi-filter-slash"
                     (click)="clear(tabelaCliente)"></button>
@@ -118,7 +127,7 @@
                       <button pButton pRipple class="p-button-rounded p-button-text" icon="pi pi-pencil"
                         pTooltip="Editar Cliente" (click)="onEditButtonClick(cliente)"></button>
                       <button pButton pRipple class="p-button-rounded p-button-text p-button-danger" icon="pi pi-ban"
-                        pTooltip="Desativar Cliente" (click)="onDisableButtonClick(cliente)"></button>
+                        pTooltip="Alterar Status Cliente" (click)="onDisableButtonClick(cliente)"></button>
                         <button pButton pRipple class="p-button-rounded p-button-text p-button" icon="pi pi-eye"
                         pTooltip="Visualizar Cliente" (click)="visualizarCliente(cliente)"></button>
                     </div>
@@ -133,7 +142,7 @@
                     </td>
                     <ng-template #statusColumn>
                       <td>
-                        <p-tag [value]="cliente.status"></p-tag>
+                        <p-tag [severity]="getSeverity(cliente.status)" [value]="cliente.status"></p-tag>
                       </td>
                     </ng-template>
                   </ng-container>
