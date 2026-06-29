@@ -73,6 +73,10 @@ const routes: Routes = [
       ),
   },
   {
+    path:'financeiro/caixa',
+    loadChildren: () => import('./modules/caixa/caixa.module').then((m) => m.CaixaModule)
+  },
+  {
     path: 'configuracoes',
     loadChildren: () =>
       import('./modules/configuracoes/configuracoes.module').then(
