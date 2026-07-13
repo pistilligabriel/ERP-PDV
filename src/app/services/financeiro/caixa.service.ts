@@ -35,7 +35,7 @@ constructor(
   }
 
   abrirCaixa(aberturaCaixa: AberturaDeCaixa):Observable<Array<Caixa>>{
-    return this.http.post<Array<Caixa>>(`${this.API_URL}/caixas`,this.getHttpOptions())
+    return this.http.post<Array<Caixa>>(`${this.API_URL}/caixas`,aberturaCaixa,this.getHttpOptions())
   }
   
   fecharCaixa(codigo:number):Observable<Array<Caixa>>{

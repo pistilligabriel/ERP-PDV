@@ -32,6 +32,10 @@ export class CaixaComponent implements OnInit, OnDestroy {
 
   valorPesquisa!: string;
 
+  public fechamentoCaixa = false;
+
+  public visualizar = false;
+
   /**
    * Limpa a seleção da tabela.
    *
@@ -86,8 +90,8 @@ export class CaixaComponent implements OnInit, OnDestroy {
 
     this.cols = [
       { field: 'codigo', header: 'Código' },
-      { field: 'dataAbertura', header: 'Data Abertura' },
       { field: 'status', header: 'Status' },
+      { field: 'dataAbertura', header: 'Data Abertura' },
       { field: 'dataFechamento', header: 'Data Fechamento' },
     ];
 
@@ -143,6 +147,7 @@ export class CaixaComponent implements OnInit, OnDestroy {
 
   visualizarCaixa(caixa: Caixa) {
     console.log(caixa);
+    this.visualizar = true
     this.showForm = true;
     this.caixaService.getCaixa(caixa.codigo).subscribe({
       next: (caixa) => {
@@ -152,7 +157,7 @@ export class CaixaComponent implements OnInit, OnDestroy {
           dataFechamento: caixa.dataFechamento,
           diferenca: caixa.diferenca,
           observacao: caixa.observacao,
-          saldoInicial: caixa.saldoInicial as number,
+          saldoInicial: caixa.saldoInicial,
           saldoFinal: caixa.saldoFinal,
           status: caixa.status,
           totalEntradas: caixa.totalEntradas,
@@ -160,6 +165,7 @@ export class CaixaComponent implements OnInit, OnDestroy {
         });
       },
     });
+    this.caixaForm.get('saldoInicial')?.disable()
   }
 
   /**
@@ -184,11 +190,13 @@ export class CaixaComponent implements OnInit, OnDestroy {
   }
 
   onDisableButtonClick(caixa: Caixa): void {
-      this.caixaForm.patchValue({
-        codigo: caixa.codigo,
-      });
-      this.fecharCaixa(caixa.codigo as number);
-    }
+    this.caixaForm.patchValue({
+      codigo: caixa.codigo,
+    });
+    this.showForm = true
+    this.fechamentoCaixa = true
+    this.visualizarCaixa(caixa)
+  }
 
   /**
    * Cancela o formulário de adição/editação e limpa os campos.
@@ -222,16 +230,19 @@ export class CaixaComponent implements OnInit, OnDestroy {
       });
   }
 
+  cancelarVisualizacao() {
+    this.showForm = false;
+    this.listarCaixas();
+  }
+
   /**
    * Abre um novo caixa.
    */
   abrirCaixa(): void {
     if (this.caixaForm.valid) {
       const aberturaCaixaRequest: AberturaDeCaixa = {
-        dataAbertura: this.caixaForm.value.dataAbertura as string,
         saldoInicial: this.caixaForm.value.saldoInicial as number,
       };
-
       this.caixaService
         .abrirCaixa(aberturaCaixaRequest)
         .pipe(takeUntil(this.destroy$))
@@ -259,7 +270,7 @@ export class CaixaComponent implements OnInit, OnDestroy {
             this.messageService.add({
               severity: 'error',
               summary: 'Erro',
-              detail: 'Erro ao abrir caixa!',
+              detail: `${error.error}`,
               life: 3000,
             });
           },
@@ -275,10 +286,10 @@ export class CaixaComponent implements OnInit, OnDestroy {
     }
   }
 
-  fecharCaixa(codigo: number) {
-    if (codigo) {
+  fecharCaixa() {
+    if (this.caixaSelecionado != null) {
       this.caixaService
-        .fecharCaixa(codigo)
+        .fecharCaixa(this.caixaSelecionado.codigo)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response: any) => {

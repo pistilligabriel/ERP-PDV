@@ -37,7 +37,7 @@
               [rowsPerPageOptions]="[10, 25, 50, 100]"
               [globalFilterFields]="['codigo', 'dataAbertura', 'status', 'dataFechamento']"
               [exportHeader]="'customExportHeader'"
-              dataKey="CODIGO"
+              dataKey="codigo"
               currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros"
               [filterDelay]="0"
             >
@@ -55,14 +55,6 @@
                     >
                       Abrir Caixa
                     </button>
-                    <!-- <button
-                      pButton
-                      pRipple
-                      icon="pi pi-ban"
-                      class="p-button-danger"
-                      (click)="disableSelectedUsers()"
-                      [disabled]="!userSelected || !userSelected.length"
-                    ></button> -->
                   </div>
 
                   <div class="flex justify-content-center mr-5">
@@ -106,7 +98,7 @@
                   >
                   </p-multiSelect>
 
-                  <span class="p-input-icon-left ml-auto mr-2">
+                  <span class="p-input-icon-left ml-auto mr-2 cursor-pointer">
                     <p-inputgroup>
                       <p-inputgroup-addon>
                         <i class="pi pi-search cursor-pointer"></i>
@@ -138,10 +130,7 @@
 
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th style="width: 3rem">Editar/Desativar</th>
-                  <!-- <th style="width: 4rem">
-                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                  </th> -->
+                  <th style="width: 3rem">Ações</th>
                   <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
                     <div class="flex justify-content-between align-items-center">
                       <div class="flex justify-content-between align-items-center">
@@ -170,26 +159,18 @@
                     <div
                       class="flex justify-content-center gap-2 align-content-center align-items-center"
                     >
-                      <!-- <button
-                        pButton
-                        pRipple
-                        class="p-button-rounded p-button-text"
-                        icon="pi pi-pencil"
-                        pTooltip="Editar Usuário"
-                        (click)="onEditButtonClick(usuario)"
-                      ></button> -->
                       <button
                         pButton
                         pRipple
-                        class="p-button-rounded p-button-text p-button-danger"
-                        icon="pi pi-ban"
-                        pTooltip="Desativar Usuário"
+                        class="p-button-rounded p-button-text p-button-danger p-button-outlined"
+                        icon="pi pi-lock"
+                        pTooltip="Fechar Caixa"
                         (click)="onDisableButtonClick(caixa)"
                       ></button>
                       <button
                         pButton
                         pRipple
-                        class="p-button-rounded p-button-text p-button-info icon-color"
+                        class="p-button-rounded p-button-text p-button-info p-button-outlined icon-color"
                         icon="pi pi-eye"
                         pTooltip="Visualizar Caixa"
                         (click)="visualizarCaixa(caixa)"
@@ -199,7 +180,7 @@
                   <!-- <td>
                     <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
                   </td> -->
-                  <td>{{ caixa.codigo }}</td>
+                  <!-- <td>{{ caixa.codigo }}</td> -->
                   <ng-container *ngFor="let col of columns">
                     <td *ngIf="col.field !== 'status'; else statusColumn">
                       {{ caixa[col.field] }}
@@ -323,17 +304,32 @@
                   class="flex flex-row justify-content-left align-content-center align-itens-center m-1"
                 >
                   <p-button
+                  *ngIf="!visualizar && !fechamentoCaixa"
                     class="mr-2"
                     (onClick)="abrirCaixa()"
                     type="submit"
                     label="Confirmar"
                   ></p-button>
+                   <p-button
+                    *ngIf="fechamentoCaixa"
+                    class="mr-2"
+                    (onClick)="fecharCaixa()"
+                    label="Confirmar Fechamento"
+                  ></p-button>
                   <p-button
+                  *ngIf="!visualizar"
                     type="submit"
                     label="Cancelar"
                     styleClass="red-button"
                     (onClick)="cancelarFormulario()"
                   ></p-button>
+                  <p-button
+                    *ngIf="visualizar"
+                    class="mr-2"
+                    (onClick)="cancelarVisualizacao()"
+                    label="Voltar"
+                  ></p-button>
+                 
                 </div>
               </div>
             </div>
