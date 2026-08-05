@@ -12,6 +12,7 @@ export interface Produto {
   unidadeVenda?: UnidadeMedida,
   precoCusto: number,
   estoque: number,
+  codigoBarras:string,
   quantidade: number,
   desconto: number,
   precoVenda: number,

@@ -270,7 +270,7 @@
           </div>
         </div>
 
-        <!--FORMULARIO DE USUARIOS-->
+        <!--FORMULARIO DE UNIDADE MEDIDA-->
         <div *ngIf="showForm" class="mt-2">
           <div class="gap-4">
             <form [formGroup]="unidadeForm" (ngSubmit)="adicionarOuEditarUnidade()">
@@ -299,13 +299,13 @@
                 </div>
 
                 <div class="p-float-label flex flex-column mr-4">
-                  <input pInputText formControlName="descricao"  style="width: 500px;"/>
                   <label for="float-label">Descrição</label>
+                  <input pInputText formControlName="descricao"  style="width: 500px;"/>
                 </div>
 
                 <div class="p-float-label flex flex-column mr-4">
-                  <input pInputText type="text" formControlName="simbolo" style="width: 500px;"/>
                   <label for="float-label">Símbolo</label>
+                  <input pInputText type="text" formControlName="simbolo" style="width: 500px;"/>
                 </div>
               </div>
             </form>

@@ -1,10 +1,10 @@
 import { registerLocaleData } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import localePt from '@angular/common/locales/pt';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 import { Table } from 'primeng/table';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, take, takeUntil } from 'rxjs';
 import { ProdutoVenda } from '../../models/Interfaces/pedido/ProdutoVenda.interface';
 import { Clientes } from '../../models/Interfaces/cadastro/clientes/Clientes.interface';
 import { FormaPagamento } from '../../models/Enum/pedido/FormaPagamento.enum';
@@ -31,6 +31,7 @@ registerLocaleData(localePt, 'pt-BR');
   styleUrls: ['./venda.component.scss'],
 })
 export class VendaComponent implements OnInit {
+
   private readonly destroy$: Subject<void> = new Subject<void>();
 
   @ViewChild('tabelaProdutoDialog') tabelaProdutoDialog: Table | undefined;
@@ -40,6 +41,8 @@ export class VendaComponent implements OnInit {
   produtos: ProdutoVenda[] = [];
 
   codigoProduto!: bigint | null;
+
+  codigoBarras?: string;
 
   lucro!: number;
 
@@ -86,6 +89,7 @@ export class VendaComponent implements OnInit {
     private router: Router,
     private vendaContext: VendaContextService,
     private configService: ConfigurationService,
+    private cp: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -235,6 +239,7 @@ export class VendaComponent implements OnInit {
       modelo: produto.modelo ?? '',
       precoVenda: produto.precoVenda ?? null,
       precoCusto: produto.precoCusto ?? null,
+      codigobarras:produto.codigobarras ?? null,
       estoque: produto.estoque ?? null,
       quantidade: produto.quantidade ?? 1,
     }));
@@ -350,6 +355,7 @@ export class VendaComponent implements OnInit {
       fabricante: produto.fabricante?.codigo ?? null,
       quantidade: this.quantidade,
       modelo: produto.modelo ?? null,
+      codigobarras:produto.codigobarras ?? null,
       codigo: produto.codigo,
       estoque: produto.estoque,
       observacao: produto.observacao,
@@ -371,5 +377,22 @@ export class VendaComponent implements OnInit {
   clearPesquisa() {
     this.valorPesquisa = '';
     this.tabelaProdutoDialog?.reset();
+  }
+
+  buscarProdutoCodigoBarras() {
+    
+    if(this.codigoBarras){
+      this.produtoService.buscarProdutoCodigoBarras(this.codigoBarras).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          if(response){
+            this.produtos.push(response)
+            this.cp.detectChanges()
+            this.codigoBarras = ''
+          }
+        }, error: (error) =>{
+          alert('erro ao inserir produto')
+        }
+      })
+    }
   }
 }

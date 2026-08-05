@@ -48,6 +48,10 @@ constructor(
   return this.http.get<Produto>(`${this.API_URL}/produtos/${codigo}`, this.getHttpOptions());
  }
 
+ buscarProdutoCodigoBarras(codigobarras:string):Observable<ProdutoVenda>{
+  return this.http.get<ProdutoVenda>(`${this.API_URL}/produtos/${codigobarras}`, this.getHttpOptions());
+ }
+
  adicionarProduto(requestDatas: AdicionarProduto):Observable<Array<Produto>>{
   return this.http.post<Array<Produto>>(`${this.API_URL}/produtos`, requestDatas, this.getHttpOptions());
  }

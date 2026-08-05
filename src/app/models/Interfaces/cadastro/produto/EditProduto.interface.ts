@@ -10,6 +10,7 @@ export interface EditarProduto {
   unidadeVenda: bigint,
   precoCusto: number,
   estoque: number,
+  codigoBarras:string,
   precoVenda: number,
   margemLucro: number,
   empresa: number,
