@@ -2,7 +2,7 @@ import { TipoProduto } from "../../../Enum/pedido/TipoProduto.enum";
 
 export interface AdicionarProduto {
   descricao: string,
-ão e  observacao: string,
+  observacao: string,
   precoCusto: number,
   estoque: number,
   codigoBarras:string,
