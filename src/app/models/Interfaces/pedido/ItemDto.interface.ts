@@ -1,5 +1,5 @@
 export interface ItemVendaDto {
-  produtoId: number;
+  produtoId: bigint;
   quantidade: number;
   observacao?: string | null;
 }

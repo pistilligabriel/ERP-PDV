@@ -234,9 +234,6 @@
                     <td>
                       <ng-container [ngSwitch]="col.field">
                         <p-tag *ngSwitchCase="'status'" [value]="produto.status"></p-tag>
-                        <span *ngSwitchCase="'fabricante'">{{
-                          produto.fabricante?.descricao
-                        }}</span>
                         <span *ngSwitchCase="'unidadeVenda'">{{
                           produto.unidadeVenda?.descricao
                         }}</span>
@@ -262,19 +259,62 @@
             </p-table>
 
             <p-dialog
-              header="Ajuste de Estoque"
-              [(visible)]="mostrarTelaAcaoAjusteEstoque"
+              header="Impressão de etiquetas"
+              [(visible)]="mostrarTelaModuloImpressaoEtiquetas"
+              [modal]="true"
+              [style]="{ width: '700px' }"
+            >
+              <p-table [value]="produtoDatas">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Código / Produto</th>
+                    <th>Quantidade de etiquetas</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-produto>
+                  <tr>
+                    <td>{{ produto.codigo }} - {{ produto.descricao }}</td>
+
+                    <td>
+                      <input
+                        pInputText
+                        type="number"
+                        min="1"
+                        [ngModel]="quantidadesEtiquetas.get(produto.codigo)"
+                        (ngModelChange)="quantidadesEtiquetas.set(produto.codigo, $event)"
+                        placeholder="Quantidade"
+                      />
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <ng-template pTemplate="footer">
+                <button
+                  pButton
+                  type="button"
+                  label="Imprimir"
+                  icon="pi pi-print"
+                  (click)="imprimirEtiquetas()"
+                ></button>
+              </ng-template>
+            </p-dialog>
+
+            <p-dialog
+              header="Saída de Estoque"
+              [(visible)]="mostrarTelaAcaoSaidaEstoque"
               [modal]="true"
             >
               <form [formGroup]="produtoAcertoEstoqueForm">
-                <p>Para diminuir a quantidade, colocar sinal de (-) antes do número. Ex: -3</p>
+                <p>Insira a quantidade de saída manual do item</p>
                 <div class="p-float-label flex flex-column mr-4 mt-5 mb-4">
-                  <input pInputText formControlName="estoque" />
                   <label for="float-label">Quantidade</label>
+                  <input pInputText formControlName="estoque" />
                 </div>
                 <p-button
                   class="mr-2"
-                  (onClick)="acertarEstoque(produto)"
+                  (onClick)="saidaEstoque(produto)"
                   type="submit"
                   label="Confirmar"
                 ></p-button>
@@ -289,8 +329,8 @@
               <form [formGroup]="produtoAcertoEstoqueForm">
                 <p>Digite a quantidade para dar entrada no estoque.</p>
                 <div class="p-float-label flex flex-column mr-4 mt-5 mb-4">
-                  <input pInputText min="0" type="number" formControlName="estoque" />
                   <label for="float-label">Quantidade</label>
+                  <input pInputText min="0" type="number" formControlName="estoque" />
                 </div>
                 <p-button
                   class="mr-2"
@@ -354,7 +394,9 @@
                   </div> -->
                 </div>
 
-                <div class="flex flex-column mt-2 mr-4">
+                <!-- MODO SISTEMA AVANÇADO -->
+
+                <!-- <div class="flex flex-column mt-2 mr-4">
                   <div class="p-float-label flex flex-column mr-2">
                     <label for="float-label">Unidade Venda</label>
                     <p-select
@@ -365,10 +407,12 @@
                       [style]="{ width: '250px' }"
                     />
                   </div>
-                </div>
+                </div> -->
 
                 <div class="flex flex-row mt-2 mr-2 mb-4">
-                  <div class="p-float-label flex flex-column mr-2">
+                  <!-- MODO SISTEMA AVANÇADO -->
+
+                  <!-- <div class="p-float-label flex flex-column mr-2">
                     <label for="float-label">Marca</label>
                     <p-select
                       optionValue="value"
@@ -381,16 +425,26 @@
                   <div class="p-float-label flex flex-column mr-2">
                     <label for="float-label">Modelo</label>
                     <input pInputText formControlName="modelo" style="width: 250px" />
-                  </div>
+                  </div> -->
                   <div class="p-float-label flex flex-column mr-2">
                     <label for="float-label">Código de Barras</label>
                     <input pInputText formControlName="codigoBarras" style="width: 250px" />
+                  </div>
+                  <div class="p-float-label flex flex-column align-center justify-centerr-2">
+                    <br />
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-barcode"
+                      label="Gerar"
+                      (click)="gerarCodigoBarras()"
+                    ></button>
                   </div>
                 </div>
               </div>
               <div class="flex flex-row mt-2 mr-2">
                 <div *ngIf="usuario.tipo == Tipo.ADMIN" class="p-float-label flex flex-column mr-2">
-                    <label for="float-label">Custo</label>
+                  <label for="float-label">Custo</label>
                   <p-inputNumber
                     formControlName="precoCusto"
                     inputId="custo"
@@ -406,7 +460,7 @@
                 </div>
 
                 <div class="p-float-label flex flex-column mr-2">
-                    <label for="float-label">Valor Venda</label>
+                  <label for="float-label">Valor Venda</label>
                   <p-inputNumber
                     formControlName="precoVenda"
                     inputId="valor"

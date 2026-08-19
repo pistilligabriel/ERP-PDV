@@ -1,7 +1,12 @@
 <div class="card flex justify-content-center gap-2">
   <p-toast></p-toast>
-  <p-confirmDialog header="Título do Diálogo" icon="pi pi-exclamation-triangle" [acceptLabel]="'OK'"
-    [rejectVisible]="false" [closable]="false"></p-confirmDialog>
+  <p-confirmDialog
+    header="Título do Diálogo"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'OK'"
+    [rejectVisible]="false"
+    [closable]="false"
+  ></p-confirmDialog>
 </div>
 
 <app-toolbar-navigation></app-toolbar-navigation>
@@ -14,49 +19,99 @@
         <div *ngIf="!showForm" class="grid">
           <div class="col-12">
             <div class="flex justify-content-end"></div>
-            <p-table  #tabelaVenda [columns]="colunasSelecionadas" [value]="vendasDatas" [(selection)]="vendaSelecionada"
-              (onRowSelect)="onRowSelect($event)" selectionMode="single" [rows]="10" [paginator]="true"
-              [resizableColumns]="true" columnResizeMode="fit" styleClass="p-datatable-gridlines"
-              [tableStyle]="{ 'min-width': '50rem' }" [rowHover]="true" [showCurrentPageReport]="true"
-              [rowsPerPageOptions]="[10, 25, 50, 100]" [globalFilterFields]="[
+            <p-table
+              #tabelaVenda
+              [columns]="colunasSelecionadas"
+              [value]="vendasDatas"
+              [(selection)]="vendaSelecionada"
+              (onRowSelect)="onRowSelect($event)"
+              selectionMode="single"
+              [rows]="10"
+              [paginator]="true"
+              [resizableColumns]="true"
+              columnResizeMode="fit"
+              styleClass="p-datatable-gridlines"
+              [tableStyle]="{ 'min-width': '50rem' }"
+              [rowHover]="true"
+              [showCurrentPageReport]="true"
+              [rowsPerPageOptions]="[10, 25, 50, 100]"
+              [globalFilterFields]="[
                 'codigo',
                 'status',
                 'dataEmissao',
                 'cliente',
                 'valorTotal',
                 'formaPagamento',
-              ]" [exportHeader]="'customExportHeader'" dataKey="codigo"
-              currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros" [filterDelay]="0"
-              [sortField]="'codigo'" [sortOrder]="-1">
+              ]"
+              [exportHeader]="'customExportHeader'"
+              dataKey="codigo"
+              currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros"
+              [filterDelay]="0"
+              [sortField]="'codigo'"
+              [sortOrder]="-1"
+            >
               <ng-template pTemplate="caption">
                 <div class="flex">
                   <div class="mr-5">
-                    <button type="button" class="mr-2 bg-green-900" pButton pRipple icon="pi pi-plus" pTooltip="Nova Venda"
-                      (click)="abrirDialogTipoVenda()">
-                    </button>
+                    <button
+                      type="button"
+                      class="mr-2 bg-white-900"
+                      pButton
+                      pRipple
+                      icon="pi pi-plus"
+                      pTooltip="Nova Venda"
+                      (click)="abrirDialogTipoVenda()"
+                    ></button>
                   </div>
 
                   <div class="flex justify-content-center mr-5">
-                    <button type="button" pButton pRipple icon="pi pi-file"  click="() => {console.log('csv')}"
-                      class="mr-2" pTooltip="CSV - Exportar os dados da tabela com formato csv."
-                      tooltipPosition="bottom"></button>
-                    <button type="button" pButton pRipple icon="pi pi-file-excel" click="() => {console.log('excel')}"
-                      class="p-button-success mr-2" pTooltip="XLS - Exportar os dados da tabela com formato xls."
-                      tooltipPosition="bottom"></button>
-                    <button type="button" pButton pRipple icon="pi pi-file-pdf" (click="() => {console.log('pdf')}"
-                      class="p-button-warning mr-2" pTooltip="PDF - Exportar os dados da tabela com formato pdf."
-                      tooltipPosition="bottom"></button>
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file"
+                      click="() => {console.log('csv')}"
+                      class="mr-2"
+                      pTooltip="CSV - Exportar os dados da tabela com formato csv."
+                      tooltipPosition="bottom"
+                    ></button>
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file-excel"
+                      click="() => {console.log('excel')}"
+                      class="p-button-success mr-2"
+                      pTooltip="XLS - Exportar os dados da tabela com formato xls."
+                      tooltipPosition="bottom"
+                    ></button>
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file-pdf"
+                      (click="() => {console.log('pdf')}"
+                      class="p-button-warning mr-2"
+                      pTooltip="PDF - Exportar os dados da tabela com formato pdf."
+                      tooltipPosition="bottom"
+                    ></button>
                   </div>
 
-                  <p-multiSelect pTooltip="Desmarque as colunas que serão ocultadas" [options]="cols"
-                    [(ngModel)]="colunasSelecionadas" optionLabel="header" selectedItemsLabel="Ocultar Colunas"
-                    [style]="{ 'min-width': '200px' }" placeholder="Selecione as Colunas">
+                  <p-multiSelect
+                    pTooltip="Desmarque as colunas que serão ocultadas"
+                    [options]="cols"
+                    [(ngModel)]="colunasSelecionadas"
+                    optionLabel="header"
+                    selectedItemsLabel="Ocultar Colunas"
+                    [style]="{ 'min-width': '200px' }"
+                    placeholder="Selecione as Colunas"
+                  >
                   </p-multiSelect>
 
                   <span class="p-input-icon-left ml-auto mr-2">
                     <p-inputgroup>
-                       <p-inputgroup-addon class="cursor-pointer">
-                      <i class="pi pi-search"></i>
+                      <p-inputgroup-addon class="cursor-pointer">
+                        <i class="pi pi-search"></i>
                       </p-inputgroup-addon>
                       <input
                         pInputText
@@ -67,10 +122,19 @@
                       />
                     </p-inputgroup>
                   </span>
-                  <button pButton label="Limpar" class="p-button-outlined text-green-900" icon="pi pi-filter-slash"
-                    (click)="clear(tabelaVenda)"></button>
-                  <button pButton class="p-button-outlined ml-3  text-green-900" icon="pi pi-refresh"
-                    (click)="atualizarTabela()"></button>
+                  <button
+                    pButton
+                    label="Limpar"
+                    class="p-button-outlined text-white-900"
+                    icon="pi pi-filter-slash"
+                    (click)="clear(tabelaVenda)"
+                  ></button>
+                  <button
+                    pButton
+                    class="p-button-outlined ml-3 text-white-900"
+                    icon="pi pi-refresh"
+                    (click)="atualizarTabela()"
+                  ></button>
                 </div>
               </ng-template>
 
@@ -82,13 +146,18 @@
                   </th> -->
                   <th pResizableColumn pSortableColumn="codigo" style="width: 3rem">
                     <div class="flex justify-content-between align-items-center">
-                      <div class="flex justify-content-between align-items-center">
-                        Código
-                      </div>
+                      <div class="flex justify-content-between align-items-center">Código</div>
                       <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="codigo"></p-sortIcon>
-                        <p-columnFilter type="text" field="codigo" display="menu" matchMode="contains"
-                          [showMatchModes]="true" [showOperator]="false" [showAddButton]="true"></p-columnFilter>
+                        <p-columnFilter
+                          type="text"
+                          field="codigo"
+                          display="menu"
+                          matchMode="contains"
+                          [showMatchModes]="true"
+                          [showOperator]="false"
+                          [showAddButton]="true"
+                        ></p-columnFilter>
                       </div>
                     </div>
                   </th>
@@ -99,8 +168,15 @@
                       </div>
                       <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="{{ col.field }}"></p-sortIcon>
-                        <p-columnFilter type="text" [field]="col.field" display="menu" matchMode="contains"
-                          [showMatchModes]="true" [showOperator]="false" [showAddButton]="true"></p-columnFilter>
+                        <p-columnFilter
+                          type="text"
+                          [field]="col.field"
+                          display="menu"
+                          matchMode="contains"
+                          [showMatchModes]="true"
+                          [showOperator]="false"
+                          [showAddButton]="true"
+                        ></p-columnFilter>
                       </div>
                     </div>
                   </th>
@@ -108,25 +184,40 @@
               </ng-template>
 
               <ng-template pTemplate="body" let-venda let-columns="columns">
-                <tr [ngClass]="getRowClass(venda)" (contextmenu)="onContextMenu($event,venda)">
+                <tr [ngClass]="getRowClass(venda)" (contextmenu)="onContextMenu($event, venda)">
                   <td>
-                    <div class="flex justify-content-center gap-2 align-content-center align-items-center">
-                      <button pButton pRipple class="p-button-rounded p-button-text p-button-info icon-color"
-                        icon="pi pi-eye" pTooltip="Visualizar Venda" (click)="verProdutos(venda?.codigo)"></button>
+                    <div
+                      class="flex justify-content-center gap-2 align-content-center align-items-center"
+                    >
+                      <button
+                        pButton
+                        pRipple
+                        class="p-button-rounded p-button-text p-button-info"
+                        style="color: black;"
+                        icon="pi pi-eye"
+                        pTooltip="Visualizar Venda"
+                        (click)="verProdutos(venda?.codigo)"
+                      ></button>
                     </div>
                   </td>
                   <td>{{ venda.codigo }}</td>
                   <ng-container>
-                    <td> {{ venda?.pedidoDto?.status }} </td>
-                    <td> {{ venda?.pedidoDto?.dataEmissao }} </td>
-                    <td> {{ venda?.pedidoDto?.integrante?.nomeCompleto }} </td>
-                    <td> R${{ venda?.pedidoDto?.totalSemDesconto | number: '1.2-2' }} </td>
-                    <td> R${{ venda?.pedidoDto?.desconto | number: '1.2-2' }} </td>
-                    <td> R${{ venda?.pedidoDto?.total | number: '1.2-2' }} </td>
-                    <td> {{ venda?.pedidoDto?.formaPagamento }} </td>
-                    <td> {{ venda?.pedidoDto?.parcelas == 0 ? "À Vista" : venda?.pedidoDto?.parcelas  }} </td>
-                    <td *ngIf="usuario?.tipo === tipo.ADMIN"> {{ venda?.pedidoDto?.lucro | number: '1.2-2' }}% </td>
-                    <td *ngIf="usuario?.tipo === tipo.ADMIN"> {{ venda?.pedidoDto?.lucroTotal | number: '1.2-2' }}% </td>
+                    <td>{{ venda?.pedidoDto?.status }}</td>
+                    <td>{{ venda?.pedidoDto?.dataEmissao }}</td>
+                    <td>{{ venda?.pedidoDto?.integrante?.nomeCompleto || venda?.pedidoDto?.nomeCliente }}</td>
+                    <!-- <td>R${{ venda?.pedidoDto?.totalSemDesconto | number: '1.2-2' }}</td> -->
+                    <!-- <td>R${{ venda?.pedidoDto?.desconto | number: '1.2-2' }}</td> -->
+                    <td>R${{ venda?.pedidoDto?.total | number: '1.2-2' }}</td>
+                    <td>{{ venda?.pedidoDto?.formaPagamento }}</td>
+                    <td>
+                      {{ venda?.pedidoDto?.parcelas == 1 ? 'À Vista' : venda?.pedidoDto?.parcelas }}
+                    </td>
+                    <!-- <td *ngIf="usuario?.tipo === tipo.ADMIN"> -->
+                      <!-- {{ venda?.pedidoDto?.lucro | number: '1.2-2' }}% -->
+                    <!-- </td> -->
+                    <!-- <td *ngIf="usuario?.tipo === tipo.ADMIN"> -->
+                      <!-- {{ venda?.pedidoDto?.lucroTotal | number: '1.2-2' }}% -->
+                    <!-- </td> -->
                     <ng-template #statusColumn>
                       <td>
                         <p-tag [value]="venda.status"></p-tag>
@@ -136,11 +227,9 @@
                 </tr>
               </ng-template>
 
-
               <ng-template pTemplate="summary">
                 <div class="text-center">
-                  Total de {{ vendasDatas ? vendasDatas.length : 0 }} Vendas
-                  Cadastradas.
+                  Total de {{ vendasDatas ? vendasDatas.length : 0 }} Vendas Cadastradas.
                 </div>
               </ng-template>
 
@@ -150,19 +239,60 @@
                 </tr>
               </ng-template>
             </p-table>
-            <p-dialog header="Selecione o tipo da venda" [(visible)]="mostrarDialogTipoVenda"  [draggable]="false" [resizable]="false" [modal]="true" [style]="{width:'25vw'}">
-              <div class="flex justify-content-between align-items-center">
+            <p-dialog
+              header="Selecione o tipo da venda"
+              [(visible)]="mostrarDialogTipoVenda"
+              [draggable]="false"
+              [resizable]="false"
+              [modal]="true"
+              [style]="{ width: '25vw' }"
+            >
+              <!-- <div class="flex justify-content-between align-items-center">
                 <p-button (onClick)="selecionarTipo('ORÇAMENTO')" label="Orçamento" [raised]="true" severity="secondary" [rounded]="true"/>
                 <p-button  (onClick)="selecionarTipo('VENDA')" label="Venda" [raised]="true"
                   severity="secondary" [rounded]="true"/>
+              </div> -->
+              <div class="flex flex-column gap-3">
+                <div class="flex flex-column gap-2">
+                  <label for="nomeCliente"> Nome do cliente </label>
+
+                  <input
+                    id="nomeCliente"
+                    pInputText
+                    type="text"
+                    [(ngModel)]="nomeCliente"
+                    placeholder="Digite o nome ou deixe em branco"
+                    class="w-full"
+                  />
+
+                  <small class="text-color-secondary">
+                    Deixe em branco para selecionar um cliente cadastrado.
+                  </small>
+                </div>
+
+                <div class="flex justify-content-end gap-2 mt-3">
+                  <p-button
+                    label="Cancelar"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="mostrarDialogTipoVenda = false"
+                  />
+
+                  <p-button label="Continuar" icon="pi pi-arrow-right" (onClick)="iniciarVenda()" />
+                </div>
               </div>
             </p-dialog>
           </div>
         </div>
-        <p-dialog header="Venda Código {{vendaAtual?.codigo}} - {{vendaAtual?.pedidoDto?.status}}"
-          [(visible)]="mostrarDialogProdutos" [draggable]="false" [modal]="true" [style]="{ width: '50vw' }">
+        <p-dialog
+          header="Venda Código {{ vendaAtual?.codigo }} - {{ vendaAtual?.pedidoDto?.status }}"
+          [(visible)]="mostrarDialogProdutos"
+          [draggable]="false"
+          [modal]="true"
+          [style]="{ width: '50vw' }"
+        >
           <div>
-            <h2>Cliente: {{vendaAtual?.pedidoDto?.integrante?.nomeCompleto}}</h2>
+            <h2>Cliente: {{ vendaAtual?.pedidoDto?.integrante?.nomeCompleto }}</h2>
           </div>
           <p-table [value]="produtosSelecionados">
             <ng-template pTemplate="header">
@@ -185,4 +315,8 @@
             </ng-template>
           </p-table>
         </p-dialog>
-        <p-contextMenu #cm [model]="items" (onHide)="onHide()" />
+        <p-contextMenu #cm [model]="items" (onHide)="onHide()"
+      /></p-card>
+    </div>
+  </div>
+</div>
