@@ -608,12 +608,9 @@ export class ProdutoComponent implements OnInit, OnDestroy {
       const requestCreateproduto: AdicionarProduto = {
         descricao: this.produtoForm.value.descricao as string,
         observacao: this.produtoForm.value.observacao as string,
-<<<<<<< HEAD
         // fabricante: this.produtoForm.value.fabricante as bigint,
         // modelo: this.produtoForm.value.modelo as string,
         // unidadeVenda: this.produtoForm.value.unidadeVenda as bigint,
-=======
->>>>>>> dd84da36cd6438252b9b16452b361f752ff08139
         precoCusto: this.produtoForm.value.precoCusto as number,
         estoque: this.produtoForm.value.estoque as number,
         codigoBarras: this.produtoForm.value.codigoBarras as string,
