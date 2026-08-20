@@ -97,7 +97,7 @@ export class VendaComponent implements OnInit {
 
   ngOnInit(): void {
     this.tipoVenda = 'VENDA';
-    this.nomeCliente = this.vendaContext.getNomeCliente();
+    this.nomeCliente = this.vendaContext.getClienteNome();
     console.log('Nome cliente:', this.nomeCliente);
 
     if (!this.tipoVenda) {
