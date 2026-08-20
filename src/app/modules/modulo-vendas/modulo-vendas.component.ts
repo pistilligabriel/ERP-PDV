@@ -73,6 +73,8 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
 
   tipo = Tipo;
 
+  clienteNome: string = ''
+
   /**
    * Limpa a seleção da tabela.
    *
@@ -388,6 +390,13 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
     console.log('Adicionar venda');
     this.vendaContext.setTipoVenda(tipo);
     console.log(tipo);
+    this.mostrarDialogTipoVenda = false;
+    this.router.navigate(['faturamento/venda']);
+  }
+
+  informarCliente(clienteNome:string){
+    console.log(clienteNome)
+    this.vendaContext.setClienteNome(clienteNome)
     this.mostrarDialogTipoVenda = false;
     this.router.navigate(['faturamento/venda']);
   }
