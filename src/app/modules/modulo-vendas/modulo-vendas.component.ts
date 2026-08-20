@@ -73,11 +73,7 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
 
   tipo = Tipo;
 
-<<<<<<< HEAD
   clienteNome: string = ''
-=======
-  nomeCliente: string = '';
->>>>>>> dd84da36cd6438252b9b16452b361f752ff08139
 
   /**
    * Limpa a seleção da tabela.
@@ -391,22 +387,22 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
   }
 
   iniciarVenda(): void {
-  const nome = this.nomeCliente?.trim() || null;
+  const nome = this.clienteNome?.trim() || null;
 
   this.vendaContext.setTipoVenda('VENDA');
-  this.vendaContext.setNomeCliente(nome);
+  this.vendaContext.setClienteNome(nome as string);
 
   this.mostrarDialogTipoVenda = false;
 
   this.router.navigate(['faturamento/venda']);
 
-  this.nomeCliente = '';
+  this.clienteNome = '';
 }
 
   selecionarTipo() {
-    const nome = this.nomeCliente?.trim() || null;
+    const nome = this.clienteNome?.trim() || null;
 
-    this.vendaContext.setNomeCliente(nome);
+    this.vendaContext.setClienteNome(nome as string);
 
     this.mostrarDialogTipoVenda = false;
     this.router.navigate(['faturamento/venda']);

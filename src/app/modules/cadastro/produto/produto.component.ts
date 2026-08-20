@@ -451,6 +451,7 @@ export class ProdutoComponent implements OnInit, OnDestroy {
     console.log(this.produtoForm.value.precoCusto);
   }
 
+  //TODO: REFATORAR BUSCAR MARGEM LUCRO DO BACKEND
   atualizarMargemLucro() {
     const precoCusto = this.produtoForm.get('precoCusto')?.value as number;
     const precoVenda = this.produtoForm.get('precoVenda')?.value as number;
@@ -468,6 +469,7 @@ export class ProdutoComponent implements OnInit, OnDestroy {
 
   onEditButtonClick(produto: Produto): void {
     this.isEdicao = true;
+    console.log(produto.codigo)
 
     if (produto.status === 'DESATIVADO') {
       this.confirmationService.confirm({
@@ -829,12 +831,12 @@ export class ProdutoComponent implements OnInit, OnDestroy {
     this.produtoService.imprimirEtiquetas(request).subscribe({
       next: () => {
         console.log('Etiquetas enviadas para impressão');
-        this.mostrarTelaModuloImpressaoEtiquetas = false;
       },
       error: (error) => {
         console.error('Erro ao imprimir etiquetas', error.error);
       },
     });
+    this.mostrarTelaModuloImpressaoEtiquetas = false;
   }
 
   onContextMenu(event: any, produto: any) {
