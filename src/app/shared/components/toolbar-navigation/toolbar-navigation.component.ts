@@ -2,12 +2,11 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { MenuItem } from 'primeng/api';
-import { DialogService } from 'primeng/dynamicdialog';
 import { Subject, takeUntil } from 'rxjs';
 import { Config } from '../../../models/Interfaces/config/config.interface';
 import { Usuario } from '../../../models/Interfaces/usuario/Usuario.interface';
-import { UsuarioService } from '../../../services/cadastro/usuario/usuario.service';
 import { UsuarioContextService } from '../../../services/cadastro/usuario/usuario-context.service';
+import { UsuarioService } from '../../../services/cadastro/usuario/usuario.service';
 import { ConfigurationService } from '../../../services/configuration/configuration.service';
 import { VendaDialogService } from '../../../services/faturamento/venda/VendaDialogService.service';
 
@@ -55,26 +54,26 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
         label: 'Cadastro',
         icon: 'pi pi-fw pi-file-edit',
         items: [
-          {
-            label: 'Usuário',
-            routerLink: ['/usuario'],
-          },
-          {
-            label: 'Cliente',
-            routerLink: ['/cliente'],
-          },
+          // {
+          //   label: 'Usuário',
+          //   routerLink: ['/usuario'],
+          // },
+          // {
+          //   label: 'Cliente',
+          //   routerLink: ['/cliente'],
+          // },
           {
             label: 'Produto',
             routerLink: ['/produto'],
           },
-          {
-            label: 'Unidade Medida',
-            routerLink: ['/unidade-medida'],
-          },
-          {
-            label: 'Marca',
-            routerLink: ['/marca'],
-          },
+          // {
+          //   label: 'Unidade Medida',
+          //   routerLink: ['/unidade-medida'],
+          // },
+          // {
+          //   label: 'Marca',
+          //   routerLink: ['/marca'],
+          // },
         ],
       },
       {
@@ -93,16 +92,17 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
           // },
         ],
       },
-      {
-        label: 'Financeiro',
-        icon: 'pi pi-fw pi-dollar',
-        items: [
-          {
-            label: 'Caixa',
-            routerLink: ['/financeiro/caixa'],
-          },
-        ],
-      },
+      // NÃO SERÁ USADO NO MOMENTO, DASHBOARD SERÁ NO HOME
+      // {   
+      //   label: 'Financeiro',
+      //   icon: 'pi pi-fw pi-dollar',
+      //   items: [
+      //     {
+      //       label: 'Caixa',
+      //       routerLink: ['/financeiro/caixa'],
+      //     },
+      //   ],
+      // },
       {
         label: 'Configuração',
         icon: 'pi pi-fw pi-database',

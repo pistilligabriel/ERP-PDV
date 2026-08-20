@@ -5,11 +5,7 @@ import { UnidadeMedida } from "../unidade-medida/UnidadeMedida.interface";
 export interface Produto {
   codigo: bigint,
   descricao: string,
-  tipoProduto: TipoProduto | null,
   observacao: string,
-  fabricante: Marca,
-  modelo: string,
-  unidadeVenda?: UnidadeMedida,
   precoCusto: number,
   estoque: number,
   codigoBarras:string,

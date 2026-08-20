@@ -13,6 +13,7 @@
       icon="pi pi-user"
       label="Cliente"
       class="btn-venda p-mb-2"
+      [disabled]="!!nomeCliente?.trim()"
       (click)="mostrarTelaCliente()"
     ></button>
     <button
@@ -36,7 +37,7 @@
       icon="pi pi-dollar"
       label="Pix"
       class="p-button-secondary mt-6"
-      (click)="pix()"
+      (click)="finalizarPorPagamento(FormaPagamento.PIX)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -44,7 +45,7 @@
       icon="pi pi-dollar"
       label="Dinheiro"
       class="p-button-secondary"
-      (click)="dinheiro()"
+      (click)="finalizarPorPagamento(FormaPagamento.DINHEIRO)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -52,7 +53,7 @@
       icon="pi pi-credit-card"
       label="Cartão Débito"
       class="p-button-secondary"
-      (click)="cartaoDebito()"
+      (click)="finalizarPorPagamento(FormaPagamento.CARTAO_DEBITO)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -60,7 +61,7 @@
       icon="pi pi-credit-card"
       label="Cartão Crédito à vista"
       class="p-button-secondary"
-      (click)="cartaoCreditoAVista()"
+      (click)="finalizarPorPagamento(FormaPagamento.CARTAO_CREDITO_A_VISTA)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -83,12 +84,12 @@
   <!-- Coluna Direita - Venda -->
   <div class="pdv-venda">
     <!-- Tabela de Produtos -->
-    <div class="w-full mb-4 mt-4 ">
+    <div class="w-full mb-4 mt-4">
       <input
-      class="h-12 p-3 rounded w-full border-2"
+        class="h-12 p-3 rounded w-full border-2"
         type="text"
-        (ngModel) = codigoBarras
-        (keyup.enter)="buscarProdutoCodigoBarras()"
+        (ngModel)="(codigoBarras)"
+        (keyup.enter)="buscarProdutoPorCodigoBarras()"
         placeholder="Código de Barras"
       />
     </div>
@@ -130,11 +131,7 @@
       [modal]="true"
       [style]="{ width: '70vw' }"
     >
-      <p-table
-        #tabelaProdutoDialog
-        [value]="produtos"
-        [globalFilterFields]="['codigo', 'descricao']"
-      >
+      <p-table #tabelaProdutoDialog [value]="resultadoPesquisa">
         <ng-template pTemplate="header">
           <input
             class="mb-4"
@@ -142,7 +139,7 @@
             pInputText
             type="text"
             [(ngModel)]="valorPesquisa"
-            (input)="applyFilterGlobal($event, 'contains')"
+            (input)="pesquisarProduto($event)"
             placeholder="Pesquisar"
           />
           <tr>
@@ -171,7 +168,7 @@
               <button
                 pButton
                 type="button"
-                [style]="{ backgroundColor: '#0E4F26' }"
+                [style]="{ backgroundColor: '#0E4F26', color: 'white' }"
                 label="Selecionar"
                 (click)="selecionarProduto(produto)"
               ></button>
@@ -220,7 +217,7 @@
               <button
                 pButton
                 type="button"
-                [style]="{ backgroundColor: '#0E4F26' }"
+                [style]="{ backgroundColor: '#0E4F26', color: 'white' }"
                 label="Selecionar"
                 (click)="selecionarCliente(cliente)"
               ></button>
@@ -272,12 +269,12 @@
       <div class="info">
         {{ cliente?.tipoDocumento || 'CPF' }}: {{ cliente?.documento || 'Não identificado' }} |
         Cliente:
-        {{ cliente?.nomeCompleto || 'Cliente não identificado' }}
+        {{
+          nomeCliente?.trim() ? nomeCliente : cliente?.nomeCompleto || 'Cliente não identificado'
+        }}
       </div>
       <div>Desconto aplicado: R$ {{ descontoAplicado | number: '1.2-2' }}</div>
       <div class="total">Total a pagar: R$ {{ total | number: '1.2-2' }}</div>
     </div>
-
-    <!-- Botões de Pagamento -->
   </div>
 </div>
