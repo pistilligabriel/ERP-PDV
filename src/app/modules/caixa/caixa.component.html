@@ -14,19 +14,19 @@
 <div>
   <div class="grid">
     <div class="col-12">
-      <p-card header="Unidade Medida" styleClass="shadow-3 m-1">
-        <!--TABELA DE UNIDADE MEDIDAS-->
+      <p-card header="Caixa" styleClass="shadow-3 m-1 ">
+        <!--TABELA DE REGISTROS DE CAIXA-->
         <div *ngIf="!showForm" class="grid">
           <div class="col-12">
             <div class="flex justify-content-end"></div>
             <p-table
-              #tabelaUnidadeMedida
+              #tabelaCaixa
               [columns]="colunasSelecionadas"
-              [value]="unidadeDatas"
-              [(selection)]="unidade"
+              [value]="caixaDatas"
+              [(selection)]="caixaSelecionado"
               (onRowSelect)="onRowSelect($event)"
               selectionMode="single"
-              [rows]="5"
+              [rows]="10"
               [paginator]="true"
               [resizableColumns]="true"
               columnResizeMode="fit"
@@ -34,13 +34,8 @@
               [tableStyle]="{ 'min-width': '50rem' }"
               [rowHover]="true"
               [showCurrentPageReport]="true"
-              [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
-              [globalFilterFields]="[
-                'codigo',
-                'status',
-                'descricao',
-                'simbolo'
-              ]"
+              [rowsPerPageOptions]="[10, 25, 50, 100]"
+              [globalFilterFields]="['codigo', 'dataAbertura', 'status', 'dataFechamento']"
               [exportHeader]="'customExportHeader'"
               dataKey="codigo"
               currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros"
@@ -55,19 +50,11 @@
                       pButton
                       pRipple
                       icon="pi pi-plus"
-                      pTooltip="Adicionar Unidade Medida"
+                      pTooltip="Abrir Caixa"
                       (click)="onAddButtonClick()"
                     >
-                      Adicionar
+                      Abrir Caixa
                     </button>
-                    <!-- <button
-                      pButton
-                      pRipple
-                      icon="pi pi-ban"
-                      class="p-button-danger"
-                      (click)="disableSelectedUsers()"
-                      [disabled]="!unidadeSelected || !unidadeSelected.length"
-                    ></button> -->
                   </div>
 
                   <div class="flex justify-content-center mr-5">
@@ -76,7 +63,6 @@
                       pButton
                       pRipple
                       icon="pi pi-file"
-                      (click)="tabelaUnidadeMedida.exportCSV()"
                       class="mr-2"
                       pTooltip="CSV - Exportar os dados da tabela com formato csv."
                       tooltipPosition="bottom"
@@ -112,10 +98,10 @@
                   >
                   </p-multiSelect>
 
-                  <span class="p-input-icon-left ml-auto mr-2">
+                  <span class="p-input-icon-left ml-auto mr-2 cursor-pointer">
                     <p-inputgroup>
-                       <p-inputgroup-addon class="cursor-pointer">
-                      <i class="pi pi-search"></i>
+                      <p-inputgroup-addon>
+                        <i class="pi pi-search cursor-pointer"></i>
                       </p-inputgroup-addon>
                       <input
                         pInputText
@@ -131,64 +117,26 @@
                     label="Limpar"
                     class="p-button-outlined"
                     icon="pi pi-filter-slash"
-                    (click)="clear(tabelaUnidadeMedida)"
+                    (click)="clear(tabelaCaixa)"
                   ></button>
-                   <button pButton class="p-button-outlined ml-3" icon="pi pi-refresh"
-                    (click)="atualizarTabela()"></button>
+                  <button
+                    pButton
+                    class="p-button-outlined ml-3"
+                    icon="pi pi-refresh"
+                    (click)="atualizarTabela()"
+                  ></button>
                 </div>
               </ng-template>
 
               <ng-template pTemplate="header" let-columns>
                 <tr>
-                  <th style="width: 3rem">Editar/Desativar</th>
-                  <!-- <th style="width: 4rem">
-                    <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                  </th> -->
-                  <th
-                    pResizableColumn
-                    pSortableColumn="codigo"
-                    style="width: 3rem"
-                  >
-                    <div
-                      class="flex justify-content-between align-items-center"
-                    >
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
-                        Código
-                      </div>
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
-                        <p-sortIcon field="codigo"></p-sortIcon>
-                        <p-columnFilter
-                          type="text"
-                          field="codigo"
-                          display="menu"
-                          matchMode="contains"
-                          [showMatchModes]="true"
-                          [showOperator]="false"
-                          [showAddButton]="true"
-                        ></p-columnFilter>
-                      </div>
-                    </div>
-                  </th>
-                  <th
-                    *ngFor="let col of columns"
-                    pResizableColumn
-                    [pSortableColumn]="col.field"
-                  >
-                    <div
-                      class="flex justify-content-between align-items-center"
-                    >
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
+                  <th style="width: 3rem">Ações</th>
+                  <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                    <div class="flex justify-content-between align-items-center">
+                      <div class="flex justify-content-between align-items-center">
                         {{ col.header }}
                       </div>
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
+                      <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="{{ col.field }}"></p-sortIcon>
                         <p-columnFilter
                           type="text"
@@ -205,7 +153,7 @@
                 </tr>
               </ng-template>
 
-              <ng-template pTemplate="body" let-unidadeMedida let-columns="columns">
+              <ng-template pTemplate="body" let-caixa let-columns="columns">
                 <tr>
                   <td>
                     <div
@@ -214,40 +162,32 @@
                       <button
                         pButton
                         pRipple
-                        class="p-button-rounded p-button-text"
-                        icon="pi pi-pencil"
-                        pTooltip="Editar Unidade Medida"
-                        (click)="onEditButtonClick(unidadeMedida)"
+                        class="p-button-rounded p-button-text p-button-danger p-button-outlined"
+                        icon="pi pi-lock"
+                        pTooltip="Fechar Caixa"
+                        (click)="onDisableButtonClick(caixa)"
                       ></button>
                       <button
                         pButton
                         pRipple
-                        class="p-button-rounded p-button-text p-button-danger"
-                        icon="pi pi-ban"
-                        pTooltip="Alterar Status Unidade Medida"
-                        (click)="onDisableButtonClick(unidadeMedida)"
-                      ></button>
-                       <button
-                        pButton
-                        pRipple
-                        class="p-button-rounded p-button-text"
+                        class="p-button-rounded p-button-text p-button-info p-button-outlined icon-color"
                         icon="pi pi-eye"
-                        pTooltip="Visualizar Unidade Medida"
-                        (click)="visualizarUnidade(unidadeMedida)"
+                        pTooltip="Visualizar Caixa"
+                        (click)="visualizarCaixa(caixa)"
                       ></button>
                     </div>
                   </td>
                   <!-- <td>
-                    <p-tableCheckbox [value]="user"></p-tableCheckbox>
+                    <p-tableCheckbox [value]="usuario"></p-tableCheckbox>
                   </td> -->
-                  <td>{{ unidadeMedida.codigo }}</td>
+                  <!-- <td>{{ caixa.codigo }}</td> -->
                   <ng-container *ngFor="let col of columns">
                     <td *ngIf="col.field !== 'status'; else statusColumn">
-                      {{ unidadeMedida[col.field] }}
+                      {{ caixa[col.field] }}
                     </td>
                     <ng-template #statusColumn>
                       <td>
-                        <p-tag [value]="unidadeMedida.status"></p-tag>
+                        <p-tag [value]="caixa.status"></p-tag>
                       </td>
                     </ng-template>
                   </ng-container>
@@ -256,8 +196,7 @@
 
               <ng-template pTemplate="summary">
                 <div class="text-center">
-                  Total de {{ unidadeDatas ? unidadeDatas.length : 0 }} Unidades
-                  Cadastradas.
+                  Total de {{ caixaDatas ? caixaDatas.length : 0 }} Caixas Registrados.
                 </div>
               </ng-template>
 
@@ -270,18 +209,17 @@
           </div>
         </div>
 
-        <!--FORMULARIO DE UNIDADE MEDIDA-->
+        <!--FORMULARIO DE USUARIOS-->
         <div *ngIf="showForm" class="mt-2">
           <div class="gap-4">
-            <form [formGroup]="unidadeForm" (ngSubmit)="adicionarOuEditarUnidade()">
+            <form [formGroup]="caixaForm" (ngSubmit)="abrirCaixa()">
               <div class="card flex flex-column md:flex-column gap-4">
                 <div class="flex flex-row">
-
                   <div class="flex flex-column mr-2">
                     <label for="label">Código</label>
-                    <input pInputText formControlName="codigo">
+                    <input pInputText formControlName="codigo" />
                   </div>
-                  
+
                   <div class="flex flex-column mr-2">
                     <label for="label">Status</label>
                     <input pInputText formControlName="status" />
@@ -289,23 +227,73 @@
 
                   <div class="flex flex-column mr-2">
                     <label for="label">Empresa</label>
-                    <input pInputText formControlName="empresa" />
+                    <input pInputText value="1" disabled/>
                   </div>
 
                   <div class="flex flex-column mr-2">
-                    <label for="label">Versão</label>
-                    <input pInputText type="text" formControlName="versao" />
+                    <label for="label">Data Abertura</label>
+                    <input pInputText type="text" formControlName="dataAbertura" />
+                  </div>
+                  <div class="flex flex-column mr-2">
+                    <label for="label">Data Fechamento</label>
+                    <input pInputText type="text" formControlName="dataFechamento" />
                   </div>
                 </div>
 
-                <div class="p-float-label flex flex-column mr-4">
-                  <label for="float-label">Descrição</label>
-                  <input pInputText formControlName="descricao"  style="width: 500px;"/>
+                <div class="flex flex-row">
+                  <div class="p-float-label flex flex-column mr-4">
+                    <label for="float-label">Saldo Inicial</label>
+                    <p-inputNumber
+                      mode="currency"
+                      currency="BRL"
+                      locale="pt-BR"
+                      formControlName="saldoInicial"
+                      style="width: 200px"
+                    />
+                  </div>
+                  <div class="p-float-label flex flex-column mr-4">
+                    <label for="float-label">Saldo Final</label>
+                    <p-inputNumber
+                      mode="currency"
+                      currency="BRL"
+                      locale="pt-BR"
+                      formControlName="saldoFinal"
+                      style="width: 200px"
+                    />
+                  </div>
                 </div>
 
-                <div class="p-float-label flex flex-column mr-4">
-                  <label for="float-label">Símbolo</label>
-                  <input pInputText type="text" formControlName="simbolo" style="width: 500px;"/>
+                <div class="flex flex-row">
+                  <div class="p-float-label flex flex-column mr-4">
+                    <label for="float-label">Entradas</label>
+                    <p-inputNumber
+                      mode="currency"
+                      currency="BRL"
+                      locale="pt-BR"
+                      formControlName="totalEntradas"
+                      style="width: 200px"
+                    />
+                  </div>
+                  <div class="p-float-label flex flex-column mr-4">
+                    <label for="float-label">Saídas</label>
+                    <p-inputNumber
+                      mode="currency"
+                      currency="BRL"
+                      locale="pt-BR"
+                      formControlName="totalSaidas"
+                      style="width: 200px"
+                    />
+                  </div>
+                  <div class="p-float-label flex flex-column mr-4">
+                    <label for="float-label">Diferença</label>
+                    <p-inputNumber
+                      mode="currency"
+                      currency="BRL"
+                      locale="pt-BR"
+                      formControlName="diferenca"
+                      style="width: 200px"
+                    />
+                  </div>
                 </div>
               </div>
             </form>
@@ -316,23 +304,38 @@
                   class="flex flex-row justify-content-left align-content-center align-itens-center m-1"
                 >
                   <p-button
+                  *ngIf="!visualizar && !fechamentoCaixa"
                     class="mr-2"
-                    (onClick)="adicionarOuEditarUnidade()"
-                    [disabled]="!unidadeForm.valid"
+                    (onClick)="abrirCaixa()"
                     type="submit"
                     label="Confirmar"
                   ></p-button>
+                   <p-button
+                    *ngIf="fechamentoCaixa"
+                    class="mr-2"
+                    (onClick)="fecharCaixa()"
+                    label="Confirmar Fechamento"
+                  ></p-button>
                   <p-button
+                  *ngIf="!visualizar"
                     type="submit"
                     label="Cancelar"
                     styleClass="red-button"
                     (onClick)="cancelarFormulario()"
                   ></p-button>
+                  <p-button
+                    *ngIf="visualizar"
+                    class="mr-2"
+                    (onClick)="cancelarVisualizacao()"
+                    label="Voltar"
+                  ></p-button>
+                 
                 </div>
               </div>
             </div>
-          </div></div
-      ></p-card>
+          </div>
+        </div>
+      </p-card>
     </div>
   </div>
 </div>

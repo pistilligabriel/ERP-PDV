@@ -2,12 +2,11 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
 import { MenuItem } from 'primeng/api';
-import { DialogService } from 'primeng/dynamicdialog';
 import { Subject, takeUntil } from 'rxjs';
 import { Config } from '../../../models/Interfaces/config/config.interface';
 import { Usuario } from '../../../models/Interfaces/usuario/Usuario.interface';
-import { UsuarioService } from '../../../services/cadastro/usuario/usuario.service';
 import { UsuarioContextService } from '../../../services/cadastro/usuario/usuario-context.service';
+import { UsuarioService } from '../../../services/cadastro/usuario/usuario.service';
 import { ConfigurationService } from '../../../services/configuration/configuration.service';
 import { VendaDialogService } from '../../../services/faturamento/venda/VendaDialogService.service';
 
@@ -55,26 +54,26 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
         label: 'Cadastro',
         icon: 'pi pi-fw pi-file-edit',
         items: [
-          {
-            label: 'Usuário',
-            routerLink: ['/usuario'],
-          },
-          {
-            label: 'Cliente',
-            routerLink: ['/cliente'],
-          },
+          // {
+          //   label: 'Usuário',
+          //   routerLink: ['/usuario'],
+          // },
+          // {
+          //   label: 'Cliente',
+          //   routerLink: ['/cliente'],
+          // },
           {
             label: 'Produto',
             routerLink: ['/produto'],
           },
-          {
-            label: 'Unidade Medida',
-            routerLink: ['/unidade-medida'],
-          },
-          {
-            label: 'Marca',
-            routerLink: ['/marca'],
-          },
+          // {
+          //   label: 'Unidade Medida',
+          //   routerLink: ['/unidade-medida'],
+          // },
+          // {
+          //   label: 'Marca',
+          //   routerLink: ['/marca'],
+          // },
         ],
       },
       {
@@ -93,36 +92,15 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
           // },
         ],
       },
-      // {
+      // NÃO SERÁ USADO NO MOMENTO, DASHBOARD SERÁ NO HOME
+      // {   
       //   label: 'Financeiro',
-      //   icon: 'pi pi-fw pi-calculator',
+      //   icon: 'pi pi-fw pi-dollar',
       //   items: [
       //     {
-      //       label: 'Titulo',
-      //       items: [
-      //         {
-      //           label: 'Receber',
-      //           routerLink: ['/financial/account/receive'],
-      //         },
-      //         {
-      //           label: 'Pagar',
-      //           routerLink: ['/financial/account/pay'],
-      //         },
-      //       ],
+      //       label: 'Caixa',
+      //       routerLink: ['/financeiro/caixa'],
       //     },
-      //     {
-      //       label: 'Movimentação',
-      //       items: [
-      //         {
-      //           label: 'Entrada',
-      //           routerLink: ['/financial/movement/entry'],
-      //         },
-      //         {
-      //           label: 'Saída',
-      //           routerLink: ['/financial/movement/exit'],
-      //         },
-      //       ],
-      //     }
       //   ],
       // },
       {
@@ -201,80 +179,54 @@ export class ToolbarNavigationComponent implements OnInit, OnDestroy {
     window.location.href = '/login';
   }
 
-getNomeEmpresa(): void {
-
-  this.configService.getConfig()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (config) => {
-
-        this.nomeEmpresa = config.nomeEmpresa;
-
-        this.cd.detectChanges();
-
-      },
-      error: (error) => {
-
-        console.error(
-          'Erro ao buscar configuração da empresa',
-          error
-        );
-
-      }
-    });
-
-}
-
-  obterInformacoes(): void {
-
-  this.configService.getLogo()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-
-      next: (blob) => {
-
-        const reader = new FileReader();
-
-
-        reader.onload = () => {
-
-          this.logo = reader.result as string;
+  getNomeEmpresa(): void {
+    this.configService
+      .getConfig()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (config) => {
+          this.nomeEmpresa = config.nomeEmpresa;
 
           this.cd.detectChanges();
+        },
+        error: (error) => {
+          console.error('Erro ao buscar configuração da empresa', error);
+        },
+      });
+  }
 
-        };
+  obterInformacoes(): void {
+    this.configService
+      .getLogo()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          const reader = new FileReader();
 
+          reader.onload = () => {
+            this.logo = reader.result as string;
 
-        reader.onerror = () => {
+            this.cd.detectChanges();
+          };
+
+          reader.onerror = () => {
+            this.logo = 'assets/default-logo.png';
+
+            this.cd.detectChanges();
+          };
+
+          reader.readAsDataURL(blob);
+        },
+
+        error: (error) => {
+          console.error('Erro ao carregar logo', error);
 
           this.logo = 'assets/default-logo.png';
 
           this.cd.detectChanges();
-
-        };
-
-
-        reader.readAsDataURL(blob);
-
-      },
-
-
-      error: (error) => {
-
-        console.error(
-          'Erro ao carregar logo',
-          error
-        );
-
-        this.logo = 'assets/default-logo.png';
-
-        this.cd.detectChanges();
-
-      }
-
-    });
-
-}
+        },
+      });
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();

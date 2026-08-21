@@ -42,7 +42,7 @@
                 'fabricante',
                 'estoque',
                 'modelo',
-                'unidadeVenda'
+                'unidadeVenda',
               ]"
               [exportHeader]="'customExportHeader'"
               dataKey="codigo"
@@ -81,7 +81,7 @@
                       pButton
                       pRipple
                       icon="pi pi-file"
-                       click="() => console.log('csv')"
+                      click="() => console.log('csv')"
                       class="mr-2"
                       pTooltip="CSV - Exportar os dados da tabela com formato csv."
                       tooltipPosition="bottom"
@@ -101,7 +101,7 @@
                       pButton
                       pRipple
                       icon="pi pi-file-pdf"
-                       click="() => console.log('pdf')"
+                      click="() => console.log('pdf')"
                       class="p-button-warning mr-2"
                       pTooltip="PDF - Exportar os dados da tabela com formato pdf."
                       tooltipPosition="bottom"
@@ -121,8 +121,8 @@
 
                   <span class="p-input-icon-left ml-auto mr-2">
                     <p-inputgroup>
-                       <p-inputgroup-addon class="cursor-pointer">
-                      <i class="pi pi-search"></i>
+                      <p-inputgroup-addon class="cursor-pointer">
+                        <i class="pi pi-search"></i>
                       </p-inputgroup-addon>
                       <input
                         pInputText
@@ -155,22 +155,10 @@
                   <!-- <th style="width: 4rem">
                     <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                   </th> -->
-                  <th
-                    pResizableColumn
-                    pSortableColumn="codigo"
-                    style="width: 3rem"
-                  >
-                    <div
-                      class="flex justify-content-between align-items-center"
-                    >
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
-                        Código
-                      </div>
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
+                  <th pResizableColumn pSortableColumn="codigo" style="width: 3rem">
+                    <div class="flex justify-content-between align-items-center">
+                      <div class="flex justify-content-between align-items-center">Código</div>
+                      <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="codigo"></p-sortIcon>
                         <p-columnFilter
                           type="text"
@@ -184,22 +172,12 @@
                       </div>
                     </div>
                   </th>
-                  <th
-                    *ngFor="let col of columns"
-                    pResizableColumn
-                    [pSortableColumn]="col.field"
-                  >
-                    <div
-                      class="flex justify-content-between align-items-center"
-                    >
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
+                  <th *ngFor="let col of columns" pResizableColumn [pSortableColumn]="col.field">
+                    <div class="flex justify-content-between align-items-center">
+                      <div class="flex justify-content-between align-items-center">
                         {{ col.header }}
                       </div>
-                      <div
-                        class="flex justify-content-between align-items-center"
-                      >
+                      <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="{{ col.field }}"></p-sortIcon>
                         <p-columnFilter
                           type="text"
@@ -256,9 +234,6 @@
                     <td>
                       <ng-container [ngSwitch]="col.field">
                         <p-tag *ngSwitchCase="'status'" [value]="produto.status"></p-tag>
-                        <span *ngSwitchCase="'fabricante'">{{
-                          produto.fabricante?.descricao
-                        }}</span>
                         <span *ngSwitchCase="'unidadeVenda'">{{
                           produto.unidadeVenda?.descricao
                         }}</span>
@@ -272,8 +247,7 @@
               <ng-template pTemplate="summary">
                 <div class="text-center">
                   Total de
-                  {{ produtoDatas ? produtoDatas.length : 0 }} Produto(s)
-                  Cadastrado(s).
+                  {{ produtoDatas ? produtoDatas.length : 0 }} Produto(s) Cadastrado(s).
                 </div>
               </ng-template>
 
@@ -285,22 +259,62 @@
             </p-table>
 
             <p-dialog
-              header="Ajuste de Estoque"
-              [(visible)]="mostrarTelaAcaoAjusteEstoque"
+              header="Impressão de etiquetas"
+              [(visible)]="mostrarTelaModuloImpressaoEtiquetas"
+              [modal]="true"
+              [style]="{ width: '700px' }"
+            >
+              <p-table [value]="produtoDatas">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Código / Produto</th>
+                    <th>Quantidade de etiquetas</th>
+                  </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-produto>
+                  <tr>
+                    <td>{{ produto.codigo }} - {{ produto.descricao }}</td>
+
+                    <td>
+                      <input
+                        pInputText
+                        type="number"
+                        min="1"
+                        [ngModel]="quantidadesEtiquetas.get(produto.codigo)"
+                        (ngModelChange)="quantidadesEtiquetas.set(produto.codigo, $event)"
+                        placeholder="Quantidade"
+                      />
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+
+              <ng-template pTemplate="footer">
+                <button
+                  pButton
+                  type="button"
+                  label="Imprimir"
+                  icon="pi pi-print"
+                  (click)="imprimirEtiquetas()"
+                ></button>
+              </ng-template>
+            </p-dialog>
+
+            <p-dialog
+              header="Saída de Estoque"
+              [(visible)]="mostrarTelaAcaoSaidaEstoque"
               [modal]="true"
             >
               <form [formGroup]="produtoAcertoEstoqueForm">
-                <p>
-                  Para diminuir a quantidade, colocar sinal de (-) antes do
-                  número. Ex: -3
-                </p>
+                <p>Insira a quantidade de saída manual do item</p>
                 <div class="p-float-label flex flex-column mr-4 mt-5 mb-4">
-                  <input pInputText formControlName="estoque" />
                   <label for="float-label">Quantidade</label>
+                  <input pInputText formControlName="estoque" />
                 </div>
                 <p-button
                   class="mr-2"
-                  (onClick)="acertarEstoque(produto)"
+                  (onClick)="saidaEstoque(produto)"
                   type="submit"
                   label="Confirmar"
                 ></p-button>
@@ -315,13 +329,8 @@
               <form [formGroup]="produtoAcertoEstoqueForm">
                 <p>Digite a quantidade para dar entrada no estoque.</p>
                 <div class="p-float-label flex flex-column mr-4 mt-5 mb-4">
-                  <input
-                    pInputText
-                    min="0"
-                    type="number"
-                    formControlName="estoque"
-                  />
                   <label for="float-label">Quantidade</label>
+                  <input pInputText min="0" type="number" formControlName="estoque" />
                 </div>
                 <p-button
                   class="mr-2"
@@ -339,10 +348,7 @@
 
         <div *ngIf="showForm" class="mt-2">
           <div class="gap-4">
-            <form
-              [formGroup]="produtoForm"
-              (ngSubmit)="adicionarOuEditarProduto()"
-            >
+            <form [formGroup]="produtoForm" (ngSubmit)="adicionarOuEditarProduto()">
               <div class="card flex flex-column md:flex-column gap-4">
                 <div class="flex flex-row">
                   <div class="flex flex-column mr-2">
@@ -367,77 +373,74 @@
 
                   <div class="flex flex-column mr-2">
                     <label for="label">Data Cadastro</label>
-                    <input
-                      pInputText
-                      type="text"
-                      formControlName="dataCadastro"
-                    />
+                    <input pInputText type="text" formControlName="dataCadastro" />
                   </div>
                 </div>
 
                 <div class="flex flex-row">
                   <div class="p-float-label flex flex-column mt-2 mr-4">
-                    <input
-                      pInputText
-                      formControlName="descricao"
-                      style="width: 500px"
-                    />
                     <label for="float-label">Descrição</label>
+                    <input pInputText formControlName="descricao" style="width: 500px" />
                   </div>
-                  <div class="p-float-label flex flex-column mt-2 mr-4" >
-                    <p-listbox
+                  <!-- <div class="p-float-label flex flex-column mt-2 mr-4">
+                    <label for="float-label">Tipo Produto</label>
+                    <p-select
                       optionValue="value"
                       optionLabel="label"
                       formControlName="tipoProduto"
                       [options]="tipoProduto"
-                      [(ngModel)]="tipoProdutoSelecionado"
                       [style]="{ width: '250px' }"
                     />
-                    <label for="float-label">Tipo Produto</label>
-                  </div>
+                  </div> -->
                 </div>
 
-                <div class="flex flex-column mt-2 mr-4">
-                  <div class="p-float-label flex flex-column mr-2">
-                    <p-listbox
+                <!-- <div class="flex flex-column mt-2 mr-4">
+                   <div class="p-float-label flex flex-column mr-2">
+                    <label for="float-label">Unidade Venda</label>
+                    <p-select
                       optionValue="value"
                       optionLabel="label"
                       formControlName="unidadeVenda"
                       [options]="unidadeMedidas"
-                      [(ngModel)]="unidadeMedidaSelecionada"
                       [style]="{ width: '250px' }"
                     />
-                    <label for="float-label">Unidade Venda</label>
-                  </div>
-                </div>
+                  </div> 
+                </div>  -->
 
                 <div class="flex flex-row mt-2 mr-2 mb-4">
-                  <div class="p-float-label flex flex-column mr-2">
-                    <p-listbox
+                  <!-- <div class="p-float-label flex flex-column mr-2">
+                    <label for="float-label">Marca</label>
+                    <p-select
                       optionValue="value"
                       optionLabel="label"
                       formControlName="fabricante"
                       [options]="marca"
-                      [(ngModel)]="marcaSelecionada"
                       [style]="{ width: '250px' }"
                     />
-                    <label for="float-label">Marca</label>
-                  </div>
-                  <div class="p-float-label flex flex-column mr-2">
-                    <input
-                      pInputText
-                      formControlName="modelo"
-                      style="width: 250px"
-                    />
+                  </div>  -->
+                  <!-- <div class="p-float-label flex flex-column mr-2">
                     <label for="float-label">Modelo</label>
+                    <input pInputText formControlName="modelo" style="width: 250px" />
+                  </div> -->
+                  <div class="p-float-label flex flex-column mr-2">
+                    <label for="float-label">Código de Barras</label>
+                    <input pInputText formControlName="codigoBarras" style="width: 250px" />
+                  </div>
+                  <div class="p-float-label flex flex-column align-center justify-centerr-2">
+                    <br />
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-barcode"
+                      label="Gerar"
+                      (click)="gerarCodigoBarras()"
+                    ></button>
                   </div>
                 </div>
               </div>
               <div class="flex flex-row mt-2 mr-2">
-                <div
-                  *ngIf="usuario.tipo == Tipo.ADMIN"
-                  class="p-float-label flex flex-column mr-2"
-                >
+                <div *ngIf="usuario.tipo == Tipo.ADMIN" class="p-float-label flex flex-column mr-2">
+                  <label for="float-label">Custo</label>
                   <p-inputNumber
                     formControlName="precoCusto"
                     inputId="custo"
@@ -445,15 +448,15 @@
                     currency="BRL"
                     locale="pt-BR"
                   />
-                  <label for="float-label">Custo</label>
                 </div>
 
                 <div class="p-float-label flex flex-column mr-2">
-                  <p-inputNumber formControlName="estoque"  />
                   <label for="float-label">Estoque</label>
+                  <p-inputNumber formControlName="estoque" />
                 </div>
 
                 <div class="p-float-label flex flex-column mr-2">
+                  <label for="float-label">Valor Venda</label>
                   <p-inputNumber
                     formControlName="precoVenda"
                     inputId="valor"
@@ -461,19 +464,11 @@
                     currency="BRL"
                     locale="pt-BR"
                   />
-                  <label for="float-label">Valor Venda</label>
                 </div>
 
-                <div
-                  *ngIf="usuario.tipo == Tipo.ADMIN"
-                  class="p-float-label flex flex-column mr-2"
-                >
-                  <p-inputNumber
-                    suffix="%"
-                    formControlName="margemLucro"
-                    inputId="margemLucro"
-                  />
+                <div *ngIf="usuario.tipo == Tipo.ADMIN" class="p-float-label flex flex-column mr-2">
                   <label for="float-label">Margem Lucro(%)</label>
+                  <p-inputNumber suffix="%" formControlName="margemLucro" inputId="margemLucro" />
                 </div>
               </div>
             </form>

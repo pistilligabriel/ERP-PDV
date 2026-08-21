@@ -1,10 +1,9 @@
 import { registerLocaleData } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import localePt from '@angular/common/locales/pt';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
-import { Table } from 'primeng/table';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, switchMap, take, takeUntil } from 'rxjs';
 import { ProdutoVenda } from '../../models/Interfaces/pedido/ProdutoVenda.interface';
 import { Clientes } from '../../models/Interfaces/cadastro/clientes/Clientes.interface';
 import { FormaPagamento } from '../../models/Enum/pedido/FormaPagamento.enum';
@@ -20,7 +19,7 @@ import { ConfigurationService } from '../../services/configuration/configuration
 import { TipoProduto } from '../../models/Enum/pedido/TipoProduto.enum';
 import { PedidoDto } from '../../models/Interfaces/pedido/PedidoDto.interface';
 import { Status } from '../../models/Enum/Status.enum';
-import { Produto } from '../../models/Interfaces/cadastro/produto/Produto.interface';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 registerLocaleData(localePt, 'pt-BR');
 
@@ -32,14 +31,17 @@ registerLocaleData(localePt, 'pt-BR');
 })
 export class VendaComponent implements OnInit {
   private readonly destroy$: Subject<void> = new Subject<void>();
-
-  @ViewChild('tabelaProdutoDialog') tabelaProdutoDialog: Table | undefined;
+  private pesquisa$ = new Subject<string>();
 
   tipoVenda: 'ORÇAMENTO' | 'VENDA' | null = null;
 
   produtos: ProdutoVenda[] = [];
 
-  codigoProduto!: bigint | null;
+  resultadoPesquisa: ProdutoVenda[] = [];
+
+  produtoSelecionado: ProdutoVenda | null = null;
+
+  codigoBarras: string = '';
 
   lucro!: number;
 
@@ -48,6 +50,8 @@ export class VendaComponent implements OnInit {
   clientes!: Clientes[];
 
   cliente: Clientes | null = null;
+
+  nomeCliente: string | null = null;
 
   total: number = 0;
 
@@ -67,7 +71,7 @@ export class VendaComponent implements OnInit {
 
   mostrarDialogCartaoPrazo: boolean = false;
 
-  parcelas!: number | null;
+  parcelas!: number;
 
   mostrarDialogQuantidade: boolean = false;
 
@@ -76,6 +80,8 @@ export class VendaComponent implements OnInit {
   empresa!: Config;
 
   Tipo = Tipo;
+
+  FormaPagamento = FormaPagamento;
 
   constructor(
     private produtoService: ProdutoService,
@@ -86,27 +92,22 @@ export class VendaComponent implements OnInit {
     private router: Router,
     private vendaContext: VendaContextService,
     private configService: ConfigurationService,
+    private cd: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.tipoVenda = this.vendaContext.getTipoVenda();
+    this.tipoVenda = 'VENDA';
+    this.nomeCliente = this.vendaContext.getClienteNome();
+    console.log('Nome cliente:', this.nomeCliente);
 
     if (!this.tipoVenda) {
       // Redirecione ou exiba alerta, se desejar
       console.warn('Tipo da venda não selecionado.');
     }
 
-    this.clienteService.getAllCliente().subscribe((c) => {
-      this.clientes = c;
-    });
-
-    this.produtoService.getAllProdutosVenda().subscribe((produtos) => {
-      this.catalogo = produtos;
-    });
+    this.carregarClientes();
 
     this.total = this.produtos.reduce((sum, p) => sum + p.precoVenda * p.quantidade, 0);
-
-    console.log(this.catalogo);
 
     this.usuarioService.getUsuarioLogado().subscribe({
       next: (usuario) => {
@@ -128,48 +129,55 @@ export class VendaComponent implements OnInit {
           console.log('Não foi possível obter a configuração da empresa', e);
         },
       });
+
+    this.pesquisa$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap((termo) => this.produtoService.pesquisar(termo)),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (produtos) => {
+          this.resultadoPesquisa = produtos as ProdutoVenda[];
+          this.cd.detectChanges();
+        },
+        error: () => {
+          this.resultadoPesquisa = [];
+        },
+      });
   }
 
-  valorPesquisa!: string;
-
-  applyFilterGlobal($event: any, stringVal: any) {
-    this.tabelaProdutoDialog!.filterGlobal(($event.target as HTMLInputElement).value, stringVal);
-  }
-
-  // Simulação de banco de produtos
-  catalogo: ProdutoVenda[] = [];
+  valorPesquisa: string = '';
 
   valorDesconto!: number | null;
 
-  adicionarProduto() {
-    if (!this.codigoProduto) return;
+  adicionarProduto(produto: ProdutoVenda): void {
+    const existente = this.produtos.find((p) => p.codigo === produto.codigo);
 
-    const produtoCatalogo = this.catalogo?.find((p) => p.codigo === this.codigoProduto);
+    if (existente) {
+      const novaQuantidade = existente.quantidade + this.quantidade;
 
-    if (produtoCatalogo) {
-      const existente = this.produtos.find((p) => p.descricao === produtoCatalogo.descricao);
-      if (existente) {
-        const novaQuantidade = existente.quantidade + this.quantidade;
-        if (produtoCatalogo.estoque !== null && novaQuantidade > produtoCatalogo.estoque) {
-          alert('Quantidade solicitada maior que o estoque disponível!');
-          return;
-        }
-        existente.quantidade = novaQuantidade;
-      } else {
-        const produtoConvertido = this.converterProdutoParaDto(produtoCatalogo);
-        if (produtoConvertido.estoque !== null && produtoConvertido.estoque < this.quantidade) {
-          alert('Quantidade solicitada maior que o estoque disponível!');
-          return;
-        } else {
-          this.produtos.push(produtoConvertido);
-        }
+      if (produto.estoque != null && novaQuantidade > produto.estoque) {
+        alert('Quantidade maior que o estoque disponível.');
+
+        return;
       }
-      this.codigoProduto = null;
-      this.quantidade = 1;
-      this.atualizarTotal();
+
+      existente.quantidade = novaQuantidade;
     } else {
-      alert('Produto não encontrado!');
+      if (produto.estoque != null && this.quantidade > produto.estoque) {
+        alert('Quantidade maior que o estoque disponível.');
+
+        return;
+      }
+      this.produtos.push({
+        ...produto,
+        quantidade: this.quantidade,
+      });
     }
+
+    this.atualizarTotal();
   }
 
   removerProduto(codigo: bigint) {
@@ -183,120 +191,240 @@ export class VendaComponent implements OnInit {
     this.totalSemDesconto = totalBruto; //Atualiza o total sem desconto
   }
 
-  dinheiro() {
-    this.tipoFinalizacaoVenda = FormaPagamento.DINHEIRO;
-    this.finalizarVenda();
+  cartaoAPrazo(): void {
+    if (!this.parcelas || this.parcelas < 2) {
+      alert('Informe uma quantidade válida de parcelas.');
+      return;
+    }
+
+    const pedido = this.montarPedido(FormaPagamento.CARTAO_PARCELADO);
+
+    this.pedidoService.salvarPedido(pedido).subscribe({
+      next: () => {
+        this.mostrarDialogCartaoPrazo = false;
+        this.limparVenda();
+        this.messageService.add({
+          summary:'Venda realizada com sucesso!',
+          severity:'success',
+          life:3000
+        })
+      },
+      error: () => {
+        this.messageService.add({
+          summary:'Erro ao finalizar venda!',
+          severity:'warn',
+          life:3000
+        })
+      },
+    });
   }
 
-  pix() {
-    this.tipoFinalizacaoVenda = FormaPagamento.PIX;
-    this.finalizarVenda();
-  }
-
-  cartaoCreditoAVista() {
-    ((this.tipoFinalizacaoVenda = FormaPagamento.CARTAO_CREDITO_A_VISTA), this.finalizarVenda());
-  }
-
-  cartaoAPrazo() {
-    ((this.tipoFinalizacaoVenda = FormaPagamento.CARTAO_PARCELADO),
-      (this.mostrarDialogCartaoPrazo = false));
-    setTimeout(() => {
-      this.finalizarVenda();
-    }, 500);
-  }
-
-  finalizarCondicional() {
-    this.tipoFinalizacaoVenda = FormaPagamento.CONDICIONAL;
-    this.finalizarVenda();
-  }
-
-  finalizarVenda() {
-    if (this.produtos.length === 0) {
+  private validarVenda(): boolean {
+    if (!this.produtos.length) {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Atenção',
-        detail: 'Adicione pelo menos um produto para finalizar a venda!',
-        life: 4000,
+
+        summary: 'Venda',
+
+        detail: 'Adicione produtos.',
       });
-      return;
-    }
-    if (!this.cliente) {
-      alert('Selecione um cliente para finalizar a venda!');
-      return;
+
+      return false;
     }
 
-    const produtosCorrigidos: ProdutoVenda[] = this.produtos.map((produto) => ({
-      codigo: produto.codigo,
-      descricao: produto.descricao,
-      tipoProduto: produto.tipoProduto,
-      observacao: produto.observacao ?? null,
-      unidadeVenda: produto.unidadeVenda ?? null,
-      fabricante: produto.fabricante ?? null,
-      modelo: produto.modelo ?? '',
-      precoVenda: produto.precoVenda ?? null,
-      precoCusto: produto.precoCusto ?? null,
-      estoque: produto.estoque ?? null,
-      quantidade: produto.quantidade ?? 1,
-    }));
+    if (!this.cliente && (!this.nomeCliente || !this.nomeCliente.trim())) {
+      this.messageService.add({
+        severity: 'warn',
 
-    console.log(
-      'Venda finalizada:',
-      produtosCorrigidos,
-      this.cliente,
-      this.tipoFinalizacaoVenda,
-      this.parcelas,
-    );
+        summary: 'Venda',
 
-    const pedido: PedidoDto = {
-      clienteId: this.cliente!.codigo,
-      formaPagamento: this.tipoFinalizacaoVenda!,
-      tipoVenda: this.tipoVenda!,
-      parcelas: this.parcelas,
-      itens: this.produtos.map((p) => ({
-        produtoId: Number(p.codigo),
-        quantidade: p.quantidade,
-        observacao: p.observacao ?? null,
+        detail: 'Selecione um cliente.',
+      });
+
+      return false;
+    }
+
+    return true;
+  }
+
+  private limparVenda(): void {
+    this.produtos = [];
+
+    this.total = 0;
+
+    this.descontoAplicado = 0;
+
+    this.valorDesconto = 0;
+
+    this.cliente = null;
+
+    this.parcelas = 1;
+
+    this.codigoBarras = '';
+
+    this.quantidade = 1;
+
+    this.produtoSelecionado = null;
+
+    this.mostrarDialogProdutos = false;
+
+    this.mostrarDialogClientes = false;
+
+    this.mostrarDialogCartaoPrazo = false;
+
+    this.mostrarDialogQuantidade = false;
+    this.resultadoPesquisa = [];
+
+    this.valorPesquisa = '';
+
+    this.totalSemDesconto = 0;
+
+    this.porcentagemDesconto = 0;
+  }
+
+  finalizarCondicional(): void {
+    if (!this.validarVenda()) {
+      return;
+    }
+
+    const request = this.montarPedido(FormaPagamento.CONDICIONAL);
+
+    this.concluirVenda(request);
+  }
+
+  private concluirVenda(request: PedidoDto): void {
+    this.pedidoService
+      .salvarPedido(request)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+
+            summary: 'Venda',
+
+            detail: 'Venda realizada com sucesso.',
+          });
+
+          this.limparVenda();
+        },
+
+        error: () => {
+          this.messageService.add({
+            severity: 'error',
+
+            summary: 'Erro',
+
+            detail: 'Erro ao finalizar venda.',
+          });
+        },
+      });
+  }
+
+  finalizarPorPagamento(forma: FormaPagamento): void {
+    if (!this.validarVenda()) {
+      return;
+    }
+
+    const request = this.montarPedido(forma);
+
+    this.concluirVenda(request);
+
+    this.router.navigate(['/home']);
+
+  }
+
+  private montarPedido(formaPagamento: FormaPagamento): PedidoDto {
+    const nomeCliente = this.nomeCliente?.trim() || null;
+
+    if (!this.cliente && !nomeCliente) {
+      throw new Error('Informe o nome do cliente ou selecione um cliente cadastrado.');
+    }
+
+    return {
+      clienteId: this.cliente?.codigo ?? null,
+
+      nomeCliente: nomeCliente,
+
+      formaPagamento,
+
+      tipoVenda: 'VENDA',
+
+      parcelas: formaPagamento === FormaPagamento.CARTAO_PARCELADO ? this.parcelas : null,
+
+      itens: this.produtos.map((produto) => ({
+        produtoId: produto.codigo,
+        quantidade: produto.quantidade,
+        observacao: null,
       })),
     };
-    this.pedidoService.criarPedido(pedido).subscribe(
-      (response) => {
-        console.log('Pedido criado com sucesso:', response);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Sucesso',
-          detail: 'Pedido criado com sucesso!',
-        });
-        this.router.navigate(['/faturamento/modulo-vendas']);
-        this.reset();
-      },
-      (error) => {
-        console.error('Erro ao criar pedido:', error, pedido);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erro',
-          detail: 'Erro ao criar pedido!',
-        });
-        this.reset();
-      },
-    );
-
-    alert('Venda finalizada com sucesso!');
   }
 
-  buscarProduto() {
-    this.mostrarDialogProdutos = true; // ABRE O DIALOG
+  carregarProdutos() {
+    this.produtoService
+      .getAllProdutosVenda()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response) {
+            this.resultadoPesquisa = response;
+            this.cd.detectChanges();
+          }
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Produto',
+            detail: 'ProdutoS não encontrados.',
+          });
+        },
+      });
   }
 
-  selecionarProduto(produto: Produto) {
-    this.codigoProduto = produto.codigo;
+  pesquisarProduto(event: Event): void {
+    console.log(this.produtos);
+    const termo = (event.target as HTMLInputElement).value.trim();
+
+    this.valorPesquisa = termo;
+
+    if (termo.length < 2) {
+      this.resultadoPesquisa = [];
+      return;
+    }
+
+    this.pesquisa$.next(termo);
+  }
+
+  buscarProduto(): void {
+    this.valorPesquisa = '';
+
+    this.resultadoPesquisa = [];
+
+    this.mostrarDialogProdutos = true;
+
+    this.carregarProdutos();
+  }
+
+  selecionarProduto(produto: ProdutoVenda): void {
+    this.produtoSelecionado = produto;
+
+    this.quantidade = 1;
+
     this.mostrarDialogProdutos = false;
+
     this.mostrarDialogQuantidade = true;
   }
 
-  quantidadeItem() {
-    this.adicionarProduto();
-    this.mostrarDialogQuantidade = false;
+  quantidadeItem(): void {
+    if (!this.produtoSelecionado) {
+      return;
+    }
+
+    this.adicionarProduto(this.produtoSelecionado);
+
+    this.produtoSelecionado = null;
     this.quantidade = 1;
+    this.mostrarDialogQuantidade = false;
   }
 
   mostrarTelaDesconto() {
@@ -316,60 +444,97 @@ export class VendaComponent implements OnInit {
     this.atualizarTotal();
   }
 
-  mostrarTelaCliente() {
+  mostrarTelaCliente(): void {
+    // Se existe cliente informado manualmente,
+    // não permite selecionar cliente cadastrado.
+    if (this.nomeCliente?.trim()) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Cliente',
+        detail: 'Esta venda já possui um cliente informado.',
+      });
+
+      return;
+    }
+
     this.mostrarDialogClientes = true;
   }
 
-  selecionarCliente(cliente: Clientes) {
+  carregarClientes() {
+    this.clienteService
+      .getAllCliente()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response) {
+            this.clientes = response;
+            this.cd.detectChanges();
+          }
+        },
+        error: () => {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Clientes',
+            detail: 'Clientes não encontrado.',
+          });
+        },
+      });
+  }
+
+  selecionarCliente(cliente: Clientes): void {
     this.cliente = cliente;
-    console.log(cliente);
+
+    // Se selecionar um cliente cadastrado,
+    // não deve existir nome de cliente avulso.
+    this.nomeCliente = '';
+
     this.mostrarDialogClientes = false;
   }
 
-  cartaoDebito() {
-    ((this.tipoFinalizacaoVenda = FormaPagamento.CARTAO_DEBITO), this.finalizarVenda());
-  }
-
   reset() {
-    this.produtos = [];
-    this.total = 0;
-    this.totalSemDesconto = 0; // Resetando o total sem desconto
-    this.descontoAplicado = 0;
-    this.cliente = null;
-    this.tipoFinalizacaoVenda = null;
-    this.parcelas = null;
+    this.limparVenda();
   }
 
-  converterProdutoParaDto(produto: any): ProdutoVenda {
-    return {
-      descricao: produto.descricao ?? null,
-      tipoProduto: produto.tipoProduto ?? null,
-      precoVenda: produto.precoVenda ?? null,
-      precoCusto: produto.precoCusto ?? null,
-      unidadeVenda: produto.unidadeVenda?.codigo ?? null,
-      fabricante: produto.fabricante?.codigo ?? null,
-      quantidade: this.quantidade,
-      modelo: produto.modelo ?? null,
-      codigo: produto.codigo,
-      estoque: produto.estoque,
-      observacao: produto.observacao,
-    };
-  }
+  cancelarVenda(): void {
+    this.limparVenda();
 
-  cancelarVenda() {
-    this.produtos = [];
     this.tipoVenda = null;
-    this.total = 0;
-    this.totalSemDesconto = 0; // Resetando o total sem desconto
-    this.descontoAplicado = 0;
-    this.cliente = null;
-    this.tipoFinalizacaoVenda = null;
-    this.parcelas = null;
+
     this.router.navigate(['/home']);
   }
 
-  clearPesquisa() {
+  clearPesquisa(): void {
     this.valorPesquisa = '';
-    this.tabelaProdutoDialog?.reset();
+
+    this.resultadoPesquisa = [];
+  }
+
+  buscarProdutoPorCodigoBarras(): void {
+    if (!this.codigoBarras.trim()) {
+      return;
+    }
+
+    this.produtoService
+      .buscarPorCodigoBarras(this.codigoBarras)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (produto) => {
+          this.quantidade = 1;
+
+          this.adicionarProduto(produto);
+
+          this.codigoBarras = '';
+
+          this.cd.detectChanges();
+        },
+
+        error: () => {
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Produto',
+            detail: 'Produto não encontrado.',
+          });
+        },
+      });
   }
 }

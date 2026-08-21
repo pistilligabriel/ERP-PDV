@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environment/environment';
 import { PedidoDto } from '../../../models/Interfaces/pedido/PedidoDto.interface';
 import { ResponseModuloVendaDto } from '../../../models/Interfaces/pedido/ResponseModuloVenda.interface';
+import { ProdutoVenda } from '../../../models/Interfaces/pedido/ProdutoVenda.interface';
 
 
 @Injectable({
@@ -29,7 +30,7 @@ export class VendaService {
     private cookie: CookieService,
   ) {  }
 
-  criarPedido(requestVenda: PedidoDto): Observable<Array<PedidoDto>> {
+  salvarPedido(requestVenda: PedidoDto): Observable<Array<PedidoDto>> {
     return this.http.post<Array<PedidoDto>>(
       `${this.API_URL}/pedidos`,
       requestVenda,
@@ -50,6 +51,8 @@ export class VendaService {
       this.getHttpOptions(),
     );
   }
+
+ 
 
   //     desativarCliente(CODIGO:bigint):Observable<Array<Clientes>>{
   //   return this.http.post<Array<Clientes>>(`${this.API_URL}/clientes/desativar/${CODIGO}`, this.httpOptions);

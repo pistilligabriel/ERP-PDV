@@ -26,6 +26,7 @@ import { ContextMenuModule } from 'primeng/contextmenu';
 import { TabsModule } from 'primeng/tabs';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { SelectModule } from 'primeng/select';
 
 @NgModule({
   declarations: [],
@@ -56,7 +57,8 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
     ListboxModule,
     TabsModule,
     InputGroupModule,
-    InputGroupAddonModule
+    InputGroupAddonModule,
+    SelectModule
   ],
   exports: [
     CardModule,
@@ -85,7 +87,8 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
     ListboxModule,
     TabsModule,
     InputGroupModule,
-    InputGroupAddonModule
+    InputGroupAddonModule,
+    SelectModule
   ],
 })
 export class PrimeNgModule {}

@@ -1,7 +1,12 @@
 <div class="card flex justify-content-center gap-2">
   <p-toast></p-toast>
-  <p-confirmDialog header="Título do Diálogo" icon="pi pi-exclamation-triangle" [acceptLabel]="'OK'"
-    [rejectVisible]="false" [closable]="false"></p-confirmDialog>
+  <p-confirmDialog
+    header="Título do Diálogo"
+    icon="pi pi-exclamation-triangle"
+    [acceptLabel]="'OK'"
+    [rejectVisible]="false"
+    [closable]="false"
+  ></p-confirmDialog>
 </div>
 
 <app-toolbar-navigation></app-toolbar-navigation>
@@ -14,11 +19,23 @@
         <div *ngIf="!showForm" class="grid">
           <div class="col-12">
             <div class="flex justify-content-end"></div>
-            <p-table #tabelaCliente [columns]="colunasSelecionadas" [value]="clienteDatas"
-              [(selection)]="clienteSelecionado" (onRowSelect)="onRowSelect($event)" selectionMode="single" [rows]="5"
-              [paginator]="true" [resizableColumns]="true" columnResizeMode="fit"
-              styleClass="p-datatable-gridlines" [tableStyle]="{ 'min-width': '50rem' }" [rowHover]="true"
-              [showCurrentPageReport]="true" [rowsPerPageOptions]="[5, 10, 25, 50, 100]" [globalFilterFields]="[
+            <p-table
+              #tabelaCliente
+              [columns]="colunasSelecionadas"
+              [value]="clienteDatas"
+              [(selection)]="clienteSelecionado"
+              (onRowSelect)="onRowSelect($event)"
+              selectionMode="single"
+              [rows]="5"
+              [paginator]="true"
+              [resizableColumns]="true"
+              columnResizeMode="fit"
+              styleClass="p-datatable-gridlines"
+              [tableStyle]="{ 'min-width': '50rem' }"
+              [rowHover]="true"
+              [showCurrentPageReport]="true"
+              [rowsPerPageOptions]="[5, 10, 25, 50, 100]"
+              [globalFilterFields]="[
                 'codigo',
                 'status',
                 'empresa',
@@ -27,14 +44,25 @@
                 'tipoDocumento',
                 'documento',
                 'uf',
-                'cidade'
-              ]" [exportHeader]="'customExportHeader'" dataKey="codigo"
-              currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros" [filterDelay]="0">
+                'cidade',
+              ]"
+              [exportHeader]="'customExportHeader'"
+              dataKey="codigo"
+              currentPageReportTemplate="Mostrando {first} de {last} de {totalRecords} registros"
+              [filterDelay]="0"
+            >
               <ng-template pTemplate="caption">
                 <div class="flex">
                   <div class="mr-5">
-                    <button type="button" class="mr-2" pButton pRipple icon="pi pi-plus" pTooltip="Adicionar Cliente"
-                      (click)="onAddButtonClick()">
+                    <button
+                      type="button"
+                      class="mr-2"
+                      pButton
+                      pRipple
+                      icon="pi pi-plus"
+                      pTooltip="Adicionar Cliente"
+                      (click)="onAddButtonClick()"
+                    >
                       Adicionar
                     </button>
                     <!-- <button
@@ -50,26 +78,50 @@
                   </div>
 
                   <div class="flex justify-content-center mr-5">
-                    <button type="button" pButton pRipple icon="pi pi-file" 
-                      class="mr-2" pTooltip="CSV - Exportar os dados da tabela com formato csv."
-                      tooltipPosition="bottom"></button>
-                    <button type="button" pButton pRipple icon="pi pi-file-excel" 
-                      class="p-button-success mr-2" pTooltip="XLS - Exportar os dados da tabela com formato xls."
-                      tooltipPosition="bottom"></button>
-                    <button type="button" pButton pRipple icon="pi pi-file-pdf" 
-                      class="p-button-warning mr-2" pTooltip="PDF - Exportar os dados da tabela com formato pdf."
-                      tooltipPosition="bottom"></button>
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file"
+                      class="mr-2"
+                      pTooltip="CSV - Exportar os dados da tabela com formato csv."
+                      tooltipPosition="bottom"
+                    ></button>
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file-excel"
+                      class="p-button-success mr-2"
+                      pTooltip="XLS - Exportar os dados da tabela com formato xls."
+                      tooltipPosition="bottom"
+                    ></button>
+                    <button
+                      type="button"
+                      pButton
+                      pRipple
+                      icon="pi pi-file-pdf"
+                      class="p-button-warning mr-2"
+                      pTooltip="PDF - Exportar os dados da tabela com formato pdf."
+                      tooltipPosition="bottom"
+                    ></button>
                   </div>
 
-                  <p-multiSelect pTooltip="Desmarque as colunas que serão ocultadas" [options]="cols"
-                    [(ngModel)]="colunasSelecionadas" optionLabel="header" selectedItemsLabel="Ocultar Colunas"
-                    [style]="{ 'min-width': '200px' }" placeholder="Selecione as Colunas">
+                  <p-multiSelect
+                    pTooltip="Desmarque as colunas que serão ocultadas"
+                    [options]="cols"
+                    [(ngModel)]="colunasSelecionadas"
+                    optionLabel="header"
+                    selectedItemsLabel="Ocultar Colunas"
+                    [style]="{ 'min-width': '200px' }"
+                    placeholder="Selecione as Colunas"
+                  >
                   </p-multiSelect>
 
                   <span class="p-input-icon-left ml-auto mr-2">
                     <p-inputgroup>
-                       <p-inputgroup-addon class=" cursor-pointer">
-                      <i class="pi pi-search"></i>
+                      <p-inputgroup-addon class="cursor-pointer">
+                        <i class="pi pi-search"></i>
                       </p-inputgroup-addon>
                       <input
                         pInputText
@@ -80,10 +132,19 @@
                       />
                     </p-inputgroup>
                   </span>
-                  <button pButton label="Limpar" class="p-button-outlined" icon="pi pi-filter-slash"
-                    (click)="clear(tabelaCliente)"></button>
-                  <button pButton class="p-button-outlined ml-3" icon="pi pi-refresh"
-                    (click)="atualizarTabela()"></button>
+                  <button
+                    pButton
+                    label="Limpar"
+                    class="p-button-outlined"
+                    icon="pi pi-filter-slash"
+                    (click)="clear(tabelaCliente)"
+                  ></button>
+                  <button
+                    pButton
+                    class="p-button-outlined ml-3"
+                    icon="pi pi-refresh"
+                    (click)="atualizarTabela()"
+                  ></button>
                 </div>
               </ng-template>
 
@@ -95,13 +156,18 @@
                   </th> -->
                   <th pResizableColumn pSortableColumn="codigo" style="width: 3rem">
                     <div class="flex justify-content-between align-items-center">
-                      <div class="flex justify-content-between align-items-center">
-                        Código
-                      </div>
+                      <div class="flex justify-content-between align-items-center">Código</div>
                       <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="codigo"></p-sortIcon>
-                        <p-columnFilter type="text" field="codigo" display="menu" matchMode="contains"
-                          [showMatchModes]="true" [showOperator]="false" [showAddButton]="true"></p-columnFilter>
+                        <p-columnFilter
+                          type="text"
+                          field="codigo"
+                          display="menu"
+                          matchMode="contains"
+                          [showMatchModes]="true"
+                          [showOperator]="false"
+                          [showAddButton]="true"
+                        ></p-columnFilter>
                       </div>
                     </div>
                   </th>
@@ -112,8 +178,15 @@
                       </div>
                       <div class="flex justify-content-between align-items-center">
                         <p-sortIcon field="{{ col.field }}"></p-sortIcon>
-                        <p-columnFilter type="text" [field]="col.field" display="menu" matchMode="contains"
-                          [showMatchModes]="true" [showOperator]="false" [showAddButton]="true"></p-columnFilter>
+                        <p-columnFilter
+                          type="text"
+                          [field]="col.field"
+                          display="menu"
+                          matchMode="contains"
+                          [showMatchModes]="true"
+                          [showOperator]="false"
+                          [showAddButton]="true"
+                        ></p-columnFilter>
                       </div>
                     </div>
                   </th>
@@ -123,13 +196,33 @@
               <ng-template pTemplate="body" let-cliente let-columns="columns">
                 <tr>
                   <td>
-                    <div class="flex justify-content-center gap-2 align-content-center align-items-center">
-                      <button pButton pRipple class="p-button-rounded p-button-text" icon="pi pi-pencil"
-                        pTooltip="Editar Cliente" (click)="onEditButtonClick(cliente)"></button>
-                      <button pButton pRipple class="p-button-rounded p-button-text p-button-danger" icon="pi pi-ban"
-                        pTooltip="Alterar Status Cliente" (click)="onDisableButtonClick(cliente)"></button>
-                        <button pButton pRipple class="p-button-rounded p-button-text p-button" icon="pi pi-eye"
-                        pTooltip="Visualizar Cliente" (click)="visualizarCliente(cliente)"></button>
+                    <div
+                      class="flex justify-content-center gap-2 align-content-center align-items-center"
+                    >
+                      <button
+                        pButton
+                        pRipple
+                        class="p-button-rounded p-button-text"
+                        icon="pi pi-pencil"
+                        pTooltip="Editar Cliente"
+                        (click)="onEditButtonClick(cliente)"
+                      ></button>
+                      <button
+                        pButton
+                        pRipple
+                        class="p-button-rounded p-button-text p-button-danger"
+                        icon="pi pi-ban"
+                        pTooltip="Alterar Status Cliente"
+                        (click)="onDisableButtonClick(cliente)"
+                      ></button>
+                      <button
+                        pButton
+                        pRipple
+                        class="p-button-rounded p-button-text p-button"
+                        icon="pi pi-eye"
+                        pTooltip="Visualizar Cliente"
+                        (click)="visualizarCliente(cliente)"
+                      ></button>
                     </div>
                   </td>
                   <!-- <td>
@@ -142,7 +235,10 @@
                     </td>
                     <ng-template #statusColumn>
                       <td>
-                        <p-tag [severity]="getSeverity(cliente.status)" [value]="cliente.status"></p-tag>
+                        <p-tag
+                          [severity]="getSeverity(cliente.status)"
+                          [value]="cliente.status"
+                        ></p-tag>
                       </td>
                     </ng-template>
                   </ng-container>
@@ -151,8 +247,7 @@
 
               <ng-template pTemplate="summary">
                 <div class="text-center">
-                  Total de {{ clienteDatas ? clienteDatas.length : 0 }} Clientes
-                  Cadastrados.
+                  Total de {{ clienteDatas ? clienteDatas.length : 0 }} Clientes Cadastrados.
                 </div>
               </ng-template>
 
@@ -170,10 +265,14 @@
           <div class="gap-4">
             <form [formGroup]="clienteForm" (ngSubmit)="adicionarOuEditarCliente()">
               <div class="card flex flex-column md:flex-column gap-4">
-                <p-tablist>
-                  <p-tabpanel header="Dados Cadastrais">
-                    <div class="flex flex-row">
+                <p-tabs value="0">
+                  <p-tablist>
+                    <p-tab value="0">Dados Cadastrais</p-tab>
+                    <p-tab value="1">Endereço</p-tab>
+                  </p-tablist>
 
+                  <p-tabpanel value="0">
+                    <div class="flex flex-row mt-5">
                       <div class="flex flex-column mr-2">
                         <label for="label">Código</label>
                         <input pInputText formControlName="codigo" />
@@ -210,96 +309,132 @@
         <p-button icon="pi pi-bookmark" [rounded]="true" [text]="true" severity="help " (click)="opLogin.toggle($event)"></p-button> -->
                     <br /><br />
                     <div class="p-float-label flex flex-column mr-4">
-                      <input pInputText formControlName="nomeCompleto" style="width: 500px" />
                       <label for="float-label">Nome Completo</label>
+                      <input pInputText formControlName="nomeCompleto" style="width: 500px" />
                     </div>
                     <!-- <p-overlayPanel #opPassword>
           Campo deve ser preenchido s senha e deve ter no minimo 6 caracteres.
         </p-overlayPanel>
         <p-button icon="pi pi-bookmark" [rounded]="true" [text]="true" severity="help " (click)="opPassword.toggle($event)"></p-button> -->
                     <br /><br />
-                   
+
                     <div class="flex flex-row mr-4">
                       <div class="p-float-label flex flex-column mr-2">
-                        <p-inputMask mask="(99)99999-9999" type="phone" formControlName="telefone" />
-                        <label for="float-label">Telefone</label>
+                          <label for="float-label">Telefone</label>
+                        <p-inputMask
+                          mask="(99)99999-9999"
+                          type="phone"
+                          formControlName="telefone"
+                        />
                       </div>
 
                       <div class="p-float-label flex flex-column mr-2">
-                        <input pInputText type="email" formControlName="email" style="width: 250px" />
-                        <label for="float-label">E-mail</label>
+                          <label for="float-label">E-mail</label>
+                        <input
+                          pInputText
+                          type="email"
+                          formControlName="email"
+                          style="width: 250px"
+                        />
                       </div>
                     </div>
 
                     <br /><br />
 
-                    <div class="flex flex-row mr-4">
-                      <div class="p-float-label flex flex-column mr-2" >
-                        <p-listbox [(ngModel)]="tipoDocumentoSelecionado" formControlName="tipoDocumento"
-                          [options]="tipoDocumento" optionValue="value"
-                          [style]="{height: '55px',width:'125px', paddingTop: '5px'}" />
-                        <label class="items-center align-middle" for="p-float-label">Tipo Doc.</label>
+                    <div class="flex flex-row mr-4 mb-5">
+                      <div class="p-float-label flex flex-column mr-2">
+                        <label class="items-center align-middle" for="p-float-label"
+                          >Tipo Doc.</label
+                        >
+                        <p-select
+                          formControlName="tipoDocumento"
+                          [options]="tipoDocumento"
+                          optionValue="value"
+                          [style]="{ height: '55px', width: '125px', paddingTop: '5px' }"
+                        />
                       </div>
 
-                      <div class="p-float-label flex flex-column mr-2" *ngIf="clienteForm.get('tipoDocumento')?.value">
-                        <p-inputMask type="text" formControlName="documento" [mask]="getDocumentoMask()"
-                          [style]="{ height: '55px' }" />
+                      <div
+                        class="p-float-label flex flex-column mr-2"
+                        *ngIf="clienteForm.get('tipoDocumento')?.value"
+                      >
                         <label for="float-label">Documento</label>
+                        <p-inputMask
+                          type="text"
+                          formControlName="documento"
+                          [mask]="getDocumentoMask()"
+                          [style]="{ height: '55px' }"
+                        />
                       </div>
                     </div>
                   </p-tabpanel>
 
-                  <p-tabpanel header="Endereço">
-                    <br />
-                    <div class="p-float-label flex flex-column mr-2">
-                      <p-inputMask type="text" mask="99.999-999" formControlName="cep" />
+                  <p-tabpanel value="1">
+                    <div class="p-float-label flex flex-column mr-2 mt-5">
                       <label for="float-label">CEP</label>
+                      <p-inputMask type="text" mask="99.999-999" formControlName="cep" />
                     </div>
                     <br /><br />
                     <div class="flex flex-row">
                       <div class="p-float-label flex flex-column mr-2">
-                        <input pInputText formControlName="municipio" />
                         <label for="float-label">Cidade</label>
+                        <input pInputText formControlName="municipio" />
                       </div>
                       <div class="p-float-label flex flex-column mr-2">
-                        <p-listbox [options]="ufOptions" formControlName="uf"
-                  optionLabel="label" optionValue="codigo" [style]="{width:'120px'}"/>
                         <label for="float-label">Estado</label>
+                        <p-select
+                          [options]="ufOptions"
+                          formControlName="uf"
+                          optionLabel="label"
+                          optionValue="codigo"
+                          [style]="{ width: '120px' }"
+                        />
                       </div>
                     </div>
                     <br /><br />
                     <div class="p-float-label flex flex-column mr-2">
-                      <input pInputText formControlName="logradouro" style="width: 500px" />
                       <label for="float-label">Logradouro</label>
+                      <input pInputText formControlName="logradouro" style="width: 500px" />
                     </div>
                     <br /><br />
                     <div class="p-float-label flex flex-column mr-2">
-                      <input pInputText formControlName="bairro" style="width: 500px" />
                       <label for="float-label">Bairro</label>
+                      <input pInputText formControlName="bairro" style="width: 500px" />
                     </div>
                     <br /><br />
 
                     <div class="p-float-label flex flex-column mr-2">
-                      <p-inputNumber formControlName="numero" />
                       <label for="float-label">Número</label>
+                      <p-inputNumber formControlName="numero" style="width: 150px;" />
                     </div>
                     <br /><br />
-                    <div class="p-float-label flex flex-column mr-2">
-                      <input pInputText formControlName="complemento" style="width: 500px" />
+                    <div class="p-float-label flex flex-column mr-2 mb-5">
                       <label for="float-label">Complemento</label>
+                      <input pInputText formControlName="complemento" style="width: 500px" />
                     </div>
                   </p-tabpanel>
-                </p-tablist>
+                </p-tabs>
               </div>
             </form>
 
             <div class="mt-2">
               <div class="card flex flex-column md:flex-column gap-4">
-                <div class="flex flex-row justify-content-left align-content-center align-itens-center m-1">
-                  <p-button class="mr-2" [disabled]="!clienteForm.valid" type="submit"
-                    (onClick)="adicionarOuEditarCliente()" label="Confirmar"></p-button>
-                  <p-button type="submit" label="Cancelar" styleClass="red-button"
-                    (onClick)="cancelarFormulario()"></p-button>
+                <div
+                  class="flex flex-row justify-content-left align-content-center align-itens-center m-1"
+                >
+                  <p-button
+                    class="mr-2"
+                    [disabled]="!clienteForm.valid"
+                    type="submit"
+                    (onClick)="adicionarOuEditarCliente()"
+                    label="Confirmar"
+                  ></p-button>
+                  <p-button
+                    type="submit"
+                    label="Cancelar"
+                    styleClass="red-button"
+                    (onClick)="cancelarFormulario()"
+                  ></p-button>
                 </div>
               </div>
             </div>

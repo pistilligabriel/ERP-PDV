@@ -73,6 +73,8 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
 
   tipo = Tipo;
 
+  clienteNome: string = ''
+
   /**
    * Limpa a seleção da tabela.
    *
@@ -150,17 +152,17 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
       { field: 'status', header: 'Status' },
       { field: 'dataEmissao', header: 'Data Emissão' },
       { field: 'cliente', header: 'Cliente' },
-      { field: 'valorBruto', header: 'Total Bruto' },
-      { field: 'desconto', header: 'Desconto' },
+      // { field: 'valorBruto', header: 'Total Bruto' },
+      // { field: 'desconto', header: 'Desconto' },
       { field: 'valorTotal', header: 'Valor Total' },
       { field: 'formaPagamento', header: 'Forma Pagamento' },
       { field: 'parcelas', header: 'Parcelas' },
     ];
 
-    if (this.usuario?.tipo === this.tipo.ADMIN) {
-      this.cols.push({ field: 'lucro', header: 'Lucro Por Parcela' });
-      this.cols.push({ field: 'lucroTotal', header: 'Lucro Total' });
-    }
+    // if (this.usuario?.tipo === this.tipo.ADMIN) {
+    //   this.cols.push({ field: 'lucro', header: 'Lucro Por Parcela' });
+    //   this.cols.push({ field: 'lucroTotal', header: 'Lucro Total' });
+    // }
 
     this.colunasSelecionadas = this.cols;
 
@@ -384,10 +386,31 @@ export class ModuloVendasComponent implements OnInit, OnDestroy {
     this.mostrarDialogTipoVenda = true;
   }
 
-  selecionarTipo(tipo: 'ORÇAMENTO' | 'VENDA') {
-    console.log('Adicionar venda');
-    this.vendaContext.setTipoVenda(tipo);
-    console.log(tipo);
+  iniciarVenda(): void {
+  const nome = this.clienteNome?.trim() || null;
+
+  this.vendaContext.setTipoVenda('VENDA');
+  this.vendaContext.setClienteNome(nome as string);
+
+  this.mostrarDialogTipoVenda = false;
+
+  this.router.navigate(['faturamento/venda']);
+
+  this.clienteNome = '';
+}
+
+  selecionarTipo() {
+    const nome = this.clienteNome?.trim() || null;
+
+    this.vendaContext.setClienteNome(nome as string);
+
+    this.mostrarDialogTipoVenda = false;
+    this.router.navigate(['faturamento/venda']);
+  }
+
+  informarCliente(clienteNome:string){
+    console.log(clienteNome)
+    this.vendaContext.setClienteNome(clienteNome)
     this.mostrarDialogTipoVenda = false;
     this.router.navigate(['faturamento/venda']);
   }

@@ -2,7 +2,7 @@
 
 <!-- Tela de login -->
 <div class="login-container">
-  <h2>Login</h2>
+  <h2 class="text-black text-lg font-semibold">Login</h2>
   <form class="login-form" [formGroup]="loginForm" (ngSubmit)="userLogin()">
     <div class="form-group">
       <input type="text" [(ngModel)]="usuarioLogin.login" pInputText placeholder="Nome" formControlName = "login"/>

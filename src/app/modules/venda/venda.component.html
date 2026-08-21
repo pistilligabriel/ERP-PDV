@@ -13,6 +13,7 @@
       icon="pi pi-user"
       label="Cliente"
       class="btn-venda p-mb-2"
+      [disabled]="!!nomeCliente?.trim()"
       (click)="mostrarTelaCliente()"
     ></button>
     <button
@@ -30,14 +31,13 @@
       (click)="cancelarVenda()"
     ></button>
 
-
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
       pButton
       icon="pi pi-dollar"
       label="Pix"
       class="p-button-secondary mt-6"
-      (click)="pix()"
+      (click)="finalizarPorPagamento(FormaPagamento.PIX)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -45,7 +45,7 @@
       icon="pi pi-dollar"
       label="Dinheiro"
       class="p-button-secondary"
-      (click)="dinheiro()"
+      (click)="finalizarPorPagamento(FormaPagamento.DINHEIRO)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -53,7 +53,7 @@
       icon="pi pi-credit-card"
       label="Cartão Débito"
       class="p-button-secondary"
-      (click)="cartaoDebito()"
+      (click)="finalizarPorPagamento(FormaPagamento.CARTAO_DEBITO)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -61,7 +61,7 @@
       icon="pi pi-credit-card"
       label="Cartão Crédito à vista"
       class="p-button-secondary"
-      (click)="cartaoCreditoAVista()"
+      (click)="finalizarPorPagamento(FormaPagamento.CARTAO_CREDITO_A_VISTA)"
     ></button>
     <button
       *ngIf="tipoVenda !== 'ORÇAMENTO'"
@@ -84,6 +84,16 @@
   <!-- Coluna Direita - Venda -->
   <div class="pdv-venda">
     <!-- Tabela de Produtos -->
+    <div class="w-full mb-4 mt-4">
+      <input
+        class="h-12 p-3 rounded w-full border-2"
+        type="text"
+        (ngModel)="(codigoBarras)"
+        (keyup.enter)="buscarProdutoPorCodigoBarras()"
+        placeholder="Código de Barras"
+      />
+    </div>
+
     <p-table [value]="produtos" [scrollable]="true" scrollHeight="300px">
       <ng-template pTemplate="header">
         <tr>
@@ -100,10 +110,8 @@
           <td>{{ produto.codigo }}</td>
           <td>{{ produto.descricao }}</td>
           <td>{{ produto.quantidade }}</td>
-          <td>R$ {{ produto.precoVenda | number: "1.2-2" }}</td>
-          <td>
-            R$ {{ produto.precoVenda * produto.quantidade | number: "1.2-2" }}
-          </td>
+          <td>R$ {{ produto.precoVenda | number: '1.2-2' }}</td>
+          <td>R$ {{ produto.precoVenda * produto.quantidade | number: '1.2-2' }}</td>
           <td>
             <button
               pButton
@@ -123,11 +131,7 @@
       [modal]="true"
       [style]="{ width: '70vw' }"
     >
-      <p-table
-        #tabelaProdutoDialog
-        [value]="produtos"
-        [globalFilterFields]="['codigo', 'descricao']"
-      >
+      <p-table #tabelaProdutoDialog [value]="resultadoPesquisa">
         <ng-template pTemplate="header">
           <input
             class="mb-4"
@@ -135,17 +139,15 @@
             pInputText
             type="text"
             [(ngModel)]="valorPesquisa"
-            (input)="applyFilterGlobal($event, 'contains')"
+            (input)="pesquisarProduto($event)"
             placeholder="Pesquisar"
           />
           <tr>
             <th>Código</th>
             <th>Descrição</th>
-            <th>
-              Tipo Produto
-            </th>
+            <th>Tipo Produto</th>
             <th>Estoque</th>
-            <th *ngIf="usuario.tipo === Tipo.ADMIN">Custo</th>
+            <th *ngIf="usuario?.tipo === Tipo.ADMIN">Custo</th>
             <th>Unitário</th>
             <th>Ação</th>
           </tr>
@@ -158,15 +160,15 @@
               {{ produto.tipoProduto }}
             </td>
             <td>{{ produto.estoque }}</td>
-            <td *ngIf="usuario.tipo === Tipo.ADMIN">
-              R$ {{ produto.precoCusto | number: "1.2-2" }}
+            <td *ngIf="usuario?.tipo === Tipo.ADMIN">
+              R$ {{ produto.precoCusto | number: '1.2-2' }}
             </td>
-            <td>R$ {{ produto.precoVenda | number: "1.2-2" }}</td>
+            <td>R$ {{ produto.precoVenda | number: '1.2-2' }}</td>
             <td>
               <button
                 pButton
                 type="button"
-                [style]="{backgroundColor:'#0E4F26'}"
+                [style]="{ backgroundColor: '#0E4F26', color: 'white' }"
                 label="Selecionar"
                 (click)="selecionarProduto(produto)"
               ></button>
@@ -175,12 +177,7 @@
         </ng-template>
       </p-table>
     </p-dialog>
-    <p-dialog
-      header="Desconto"
-      [draggable]="false"
-      [(visible)]="mostrarDesconto"
-      [modal]="true"
-    >
+    <p-dialog header="Desconto" [draggable]="false" [(visible)]="mostrarDesconto" [modal]="true">
       <div class="p-float-label flex flex-column mr-4 mt-4 mb-4">
         <input pInputText [(ngModel)]="valorDesconto" />
         <label for="float-label">Desconto(%)</label>
@@ -188,7 +185,7 @@
       <p-button
         class="mr-2"
         (onClick)="aplicarDesconto()"
-        [style]="{backgroundColor:'#0E4F26'}"
+        [style]="{ backgroundColor: '#0E4F26' }"
         type="submit"
         label="Confirmar"
       ></p-button>
@@ -214,19 +211,13 @@
             <td>{{ cliente.nomeCompleto }}</td>
             <td>{{ cliente.documento }}</td>
             <td>
-              {{
-                cliente.logradouro +
-                  " - " +
-                  cliente.bairro +
-                  " - " +
-                  cliente.municipio
-              }}
+              {{ cliente.logradouro + ' - ' + cliente.bairro + ' - ' + cliente.municipio }}
             </td>
             <td>
               <button
                 pButton
                 type="button"
-                [style]="{backgroundColor:'#0E4F26'}"
+                [style]="{ backgroundColor: '#0E4F26', color: 'white' }"
                 label="Selecionar"
                 (click)="selecionarCliente(cliente)"
               ></button>
@@ -249,7 +240,7 @@
         class="mr-2"
         (onClick)="cartaoAPrazo()"
         type="submit"
-        [style]="{backgroundColor:'#0E4F26'}"
+        [style]="{ backgroundColor: '#0E4F26' }"
         label="Confirmar"
       ></p-button>
     </p-dialog>
@@ -267,7 +258,7 @@
         class="mr-2"
         (onClick)="quantidadeItem()"
         type="submit"
-        [style]="{backgroundColor:'#0E4F26'}"
+        [style]="{ backgroundColor: '#0E4F26' }"
         label="Confirmar"
       ></p-button>
     </p-dialog>
@@ -276,14 +267,14 @@
     <div class="pdv-footer">
       <div>Tipo Venda: {{ tipoVenda }}</div>
       <div class="info">
-        {{ cliente?.tipoDocumento || "CPF" }}:
-        {{ cliente?.documento || "Não identificado" }} | Cliente:
-        {{ cliente?.nomeCompleto || "Cliente não identificado" }}
+        {{ cliente?.tipoDocumento || 'CPF' }}: {{ cliente?.documento || 'Não identificado' }} |
+        Cliente:
+        {{
+          nomeCliente?.trim() ? nomeCliente : cliente?.nomeCompleto || 'Cliente não identificado'
+        }}
       </div>
-      <div>Desconto aplicado: R$ {{ descontoAplicado | number: "1.2-2" }}</div>
-      <div class="total">Total a pagar: R$ {{ total | number: "1.2-2" }}</div>
+      <div>Desconto aplicado: R$ {{ descontoAplicado | number: '1.2-2' }}</div>
+      <div class="total">Total a pagar: R$ {{ total | number: '1.2-2' }}</div>
     </div>
-
-    <!-- Botões de Pagamento -->
   </div>
 </div>

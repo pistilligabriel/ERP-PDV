@@ -11,10 +11,10 @@ integrante: ClienteResumoDto;
 formaPagamento: FormaPagamento;
 parcelas: number | null;
 tipoVenda: 'VENDA' | 'ORÇAMENTO';
-desconto: number;
-totalSemDesconto: number;
+// desconto: number;
+// totalSemDesconto: number;
 total: number;
-lucro: number;
-lucroTotal: number;
+// lucro: number;
+// lucroTotal: number;
 produtos: ItemVendaResponseDto[];
 }

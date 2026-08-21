@@ -8,6 +8,7 @@ export interface ProdutoVenda {
   unidadeVenda: number | null; // alterado aqui
   fabricante: number | null; // alterado aqui
   modelo: string;
+  codigobarras:string;
   precoVenda: number;
   precoCusto: number;
   estoque: number | null;
