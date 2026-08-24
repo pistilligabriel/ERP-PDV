@@ -481,7 +481,7 @@
                   <p-button
                     class="mr-2"
                     (onClick)="adicionarOuEditarProduto()"
-                    [disabled]="!produtoForm.valid"
+                    [disabled]="!produtoForm.valid || isSaving"
                     type="submit"
                     label="Confirmar"
                   ></p-button>

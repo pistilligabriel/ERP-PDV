@@ -52,6 +52,13 @@ export class ClienteComponent implements OnInit {
 
   ufSelecionada!: Uf;
 
+  //Controle edicao
+  isEdicao: boolean = false;
+
+  //Controle salvar só 1 registro por vez
+  isSaving: boolean = false;
+
+
   /**
    * Limpa a seleção da tabela.
    *
@@ -84,7 +91,7 @@ export class ClienteComponent implements OnInit {
     private router: Router,
     private formBuilderCliente: FormBuilder,
     private confirmationService: ConfirmationService,
-    private cd:ChangeDetectorRef
+    private cd: ChangeDetectorRef,
   ) {
     /**
      * Formulário reativo para adicionar/editar clientes.
@@ -199,7 +206,7 @@ export class ClienteComponent implements OnInit {
       case 'DESATIVADO':
         return 'danger';
       default:
-        return
+        return;
     }
   }
 
@@ -214,15 +221,6 @@ export class ClienteComponent implements OnInit {
     this.clienteSelecionado = event.data;
   }
 
-  /**
-   * Verifica se o formulário está em modo de edição.
-   *
-   * @returns {boolean} - Verdadeiro se estiver em modo de edição, falso caso contrário.
-   */
-  isEdicao(): boolean {
-    console.log('edicao');
-    return !!this.clienteForm.getRawValue().codigo;
-  }
 
   visualizarCliente(cliente: Clientes) {
     this.showForm = true;
@@ -268,6 +266,7 @@ export class ClienteComponent implements OnInit {
    * Exibe o formulário de adição de grupo.
    */
   onAddButtonClick() {
+    this.isEdicao = false;
     console.log('Adicionar cliente');
     this.showForm = true;
     this.clienteForm.setValue({
@@ -291,7 +290,7 @@ export class ClienteComponent implements OnInit {
   }
 
   onEditButtonClick(cliente: Clientes): void {
-    console.log(this.isEdicao());
+    this.isEdicao = true;
     // const formattedDate = format(new Date(cliente.versao), 'dd/MM/yyyy HH:mm:ss');
     console.log('onEditButton');
     if (cliente.status === 'DESATIVADO') {
@@ -325,7 +324,6 @@ export class ClienteComponent implements OnInit {
         console.log(data);
       });
 
-      console.log(this.isEdicao());
     }
   }
 
@@ -376,7 +374,7 @@ export class ClienteComponent implements OnInit {
         next: (response) => {
           if (response) {
             this.clienteDatas = response;
-            this.cd.detectChanges()
+            this.cd.detectChanges();
           }
         },
         error: (error) => {
@@ -396,11 +394,10 @@ export class ClienteComponent implements OnInit {
    * Adiciona ou edita um grupo de usuário com base no estado do formulário.
    */
   adicionarOuEditarCliente(): void {
-    if (this.isEdicao()) {
-      console.log('Editar Cliente');
+    this.isSaving = true;
+    if (this.isEdicao) {
       this.editarCliente();
     } else {
-      console.log('Adicionar Cliente');
       this.adicionarCliente();
     }
   }
@@ -441,6 +438,8 @@ export class ClienteComponent implements OnInit {
             // Resetar o formulário
             this.clienteForm.reset();
 
+            this.isSaving = false;
+
             // Voltar para a tabela
             this.showForm = false;
 
@@ -455,6 +454,7 @@ export class ClienteComponent implements OnInit {
               detail: 'Erro ao criar cliente!',
               life: 3000,
             });
+            this.isSaving = false;
           },
         });
     } else {
@@ -508,6 +508,7 @@ export class ClienteComponent implements OnInit {
                 life: 3000,
               });
               this.clienteForm.reset();
+              this.isSaving = false;
               this.showForm = false;
               this.listarClientes();
             }
@@ -520,6 +521,7 @@ export class ClienteComponent implements OnInit {
               detail: 'Erro ao editar cliente!',
               life: 3000,
             });
+            this.isSaving = false;
           },
         });
     } else {

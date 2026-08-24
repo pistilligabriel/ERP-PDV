@@ -54,6 +54,8 @@ export class ProdutoComponent implements OnInit, OnDestroy {
 
   isEdicao: boolean = false;
 
+  isSaving: boolean = false;
+
   /**
    * Lista de dados de produtos.
    */
@@ -595,6 +597,7 @@ export class ProdutoComponent implements OnInit, OnDestroy {
    * Adiciona ou edita um produto com base no estado do formulário.
    */
   adicionarOuEditarProduto(): void {
+    this.isSaving = true;
     if (this.isEdicao) {
       this.editarProduto();
     } else {
@@ -639,6 +642,9 @@ export class ProdutoComponent implements OnInit, OnDestroy {
             // Resetar o formulário
             this.produtoForm.reset();
 
+            //Libera o botão de salvar
+            this.isSaving = false
+
             // Voltar para a tabela
             this.showForm = false;
 
@@ -653,8 +659,9 @@ export class ProdutoComponent implements OnInit, OnDestroy {
               detail: 'Erro ao criar produto!',
               life: 3000,
             });
+            this.isSaving = false
           },
-        });
+    });
     } else {
       console.log('Formulário inválido. Preencha todos os campos.', this.produtoForm);
       this.messageService.add({
@@ -700,6 +707,7 @@ export class ProdutoComponent implements OnInit, OnDestroy {
                 life: 3000,
               });
               this.produtoForm.reset();
+              this.isSaving = false;
               this.showForm = false;
               this.listarProdutos();
             }
@@ -712,6 +720,7 @@ export class ProdutoComponent implements OnInit, OnDestroy {
               detail: 'Erro ao editar produto!',
               life: 3000,
             });
+            this.isSaving = false;
           },
         });
     } else {

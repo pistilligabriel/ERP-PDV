@@ -424,7 +424,7 @@
                 >
                   <p-button
                     class="mr-2"
-                    [disabled]="!clienteForm.valid"
+                    [disabled]="!clienteForm.valid || isSaving"
                     type="submit"
                     (onClick)="adicionarOuEditarCliente()"
                     label="Confirmar"
