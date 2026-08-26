@@ -145,9 +145,7 @@
           <tr>
             <th>Código</th>
             <th>Descrição</th>
-            <th>Tipo Produto</th>
             <th>Estoque</th>
-            <th *ngIf="usuario?.tipo === Tipo.ADMIN">Custo</th>
             <th>Unitário</th>
             <th>Ação</th>
           </tr>
@@ -156,13 +154,7 @@
           <tr>
             <td>{{ produto.codigo }}</td>
             <td>{{ produto.descricao }}</td>
-            <td>
-              {{ produto.tipoProduto }}
-            </td>
             <td>{{ produto.estoque }}</td>
-            <td *ngIf="usuario?.tipo === Tipo.ADMIN">
-              R$ {{ produto.precoCusto | number: '1.2-2' }}
-            </td>
             <td>R$ {{ produto.precoVenda | number: '1.2-2' }}</td>
             <td>
               <button
@@ -179,8 +171,8 @@
     </p-dialog>
     <p-dialog header="Desconto" [draggable]="false" [(visible)]="mostrarDesconto" [modal]="true">
       <div class="p-float-label flex flex-column mr-4 mt-4 mb-4">
-        <input pInputText [(ngModel)]="valorDesconto" />
         <label for="float-label">Desconto(%)</label>
+        <input pInputText [(ngModel)]="valorDesconto" />
       </div>
       <p-button
         class="mr-2"
@@ -233,8 +225,8 @@
       [modal]="true"
     >
       <div class="p-float-label flex flex-column mr-4 mt-4 mb-4">
-        <input pInputText [(ngModel)]="parcelas" />
         <label for="float-label">Parcelas</label>
+        <input pInputText [(ngModel)]="parcelas" />
       </div>
       <p-button
         class="mr-2"
@@ -251,8 +243,8 @@
       [modal]="true"
     >
       <div class="p-float-label flex flex-column mr-4 mt-4 mb-4">
-        <input pInputText type="number" [(ngModel)]="quantidade" />
         <label for="float-label">Quantidade</label>
+        <input pInputText type="number" [(ngModel)]="quantidade" />
       </div>
       <p-button
         class="mr-2"
