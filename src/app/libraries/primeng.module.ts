@@ -27,6 +27,8 @@ import { TabsModule } from 'primeng/tabs';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { SelectModule } from 'primeng/select';
+import { ChartModule } from 'primeng/chart';
+import { DatePickerModule } from 'primeng/datepicker'
 
 @NgModule({
   declarations: [],
@@ -58,7 +60,9 @@ import { SelectModule } from 'primeng/select';
     TabsModule,
     InputGroupModule,
     InputGroupAddonModule,
-    SelectModule
+    SelectModule,
+    ChartModule,
+    DatePickerModule
   ],
   exports: [
     CardModule,
@@ -88,7 +92,9 @@ import { SelectModule } from 'primeng/select';
     TabsModule,
     InputGroupModule,
     InputGroupAddonModule,
-    SelectModule
+    SelectModule,
+    ChartModule,
+    DatePickerModule
   ],
 })
 export class PrimeNgModule {}

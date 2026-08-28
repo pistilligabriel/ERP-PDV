@@ -88,7 +88,7 @@
       <input
         class="h-12 p-3 rounded w-full border-2"
         type="text"
-        (ngModel)="(codigoBarras)"
+        [(ngModel)]= 'codigoBarras'
         (keyup.enter)="buscarProdutoPorCodigoBarras()"
         placeholder="Código de Barras"
       />
@@ -226,7 +226,7 @@
     >
       <div class="p-float-label flex flex-column mr-4 mt-4 mb-4">
         <label for="float-label">Parcelas</label>
-        <input pInputText [(ngModel)]="parcelas" />
+        <input pInputText [(ngModel)]="parcelas" min="2" max="5"/>
       </div>
       <p-button
         class="mr-2"
