@@ -204,17 +204,21 @@ export class VendaComponent implements OnInit {
         this.mostrarDialogCartaoPrazo = false;
         this.limparVenda();
         this.messageService.add({
-          summary:'Venda realizada com sucesso!',
-          severity:'success',
-          life:3000
-        })
+          summary: 'Venda realizada com sucesso!',
+          severity: 'success',
+          life: 3000,
+        });
+        this.router.navigate(['/home']).then(() => {
+          setTimeout(() => {}, 1000);
+        });
       },
-      error: () => {
+      error: (e) => {
         this.messageService.add({
-          summary:'Erro ao finalizar venda!',
-          severity:'warn',
-          life:3000
-        })
+          summary: 'Erro ao finalizar venda!',
+          severity: 'warn',
+          detail: e.error,
+          life: 3000,
+        });
       },
     });
   }
@@ -330,8 +334,9 @@ export class VendaComponent implements OnInit {
 
     this.concluirVenda(request);
 
-    this.router.navigate(['/home']);
-
+    this.router.navigate(['/home']).then(() => {
+      setTimeout(() => {}, 1000);
+    });
   }
 
   private montarPedido(formaPagamento: FormaPagamento): PedidoDto {

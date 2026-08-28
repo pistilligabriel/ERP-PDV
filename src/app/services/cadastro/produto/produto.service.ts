@@ -51,7 +51,7 @@ export class ProdutoService {
 
   buscarPorCodigoBarras(codigobarras: string): Observable<ProdutoVenda> {
     return this.http.get<ProdutoVenda>(
-      `${this.API_URL}/produtos/${codigobarras}`,
+      `${this.API_URL}/produtos/codigo-barras/${codigobarras}`,
       this.getHttpOptions(),
     );
   }

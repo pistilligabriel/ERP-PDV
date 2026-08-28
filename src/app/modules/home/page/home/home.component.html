@@ -1,11 +1,138 @@
 <app-toolbar-navigation></app-toolbar-navigation>
 
+<div class="p-4">
+  <p-card header="Dashboard de Vendas" styleClass="shadow-3">
+    <!-- Filtro -->
+    <div class="flex flex-wrap gap-3 align-items-end mb-5">
+      <div class="flex flex-column gap-2">
+        <label for="dataInicio">Data inicial</label>
 
-<div class="flex" [style]="{'height': '88vh'}">
-  <div class="col-12">
-    <p-card
-    header="Home"
-    styleClass="shadow-3 m-5 "
-    ></p-card>
-  </div>
+        <p-datepicker
+          inputId="dataInicio"
+          [(ngModel)]="dataInicio"
+          (onSelect)="buscarDados()"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecione a data"
+          [showIcon]="true"
+          iconDisplay="input"
+        >
+        </p-datepicker>
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label for="dataFim">Data final</label>
+
+        <p-datepicker
+          inputId="dataFim"
+          [(ngModel)]="dataFim"
+          (onSelect)="buscarDados()"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecione a data"
+          [showIcon]="true"
+          iconDisplay="input"
+        >
+        </p-datepicker>
+      </div>
+
+      <p-button label="Filtrar" icon="pi pi-search" (onClick)="buscarDados()"> </p-button>
+    </div>
+
+    <!-- Indicadores -->
+    <div class="grid">
+      <!-- Quantidade de vendas -->
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card>
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <span class="text-500">Quantidade de vendas</span>
+
+              <div class="text-2xl font-bold mt-2">
+                {{ quantidadeVendas }}
+              </div>
+            </div>
+
+            <i class="pi pi-shopping-cart text-3xl"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Valor vendido -->
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card>
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <span class="text-500">Valor vendido</span>
+
+              <div class="text-2xl font-bold mt-2">
+                {{ valorVendido | currency: 'BRL' }}
+              </div>
+            </div>
+
+            <i class="pi pi-dollar text-3xl"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Produtos vendidos -->
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card>
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <span class="text-500">Produtos vendidos</span>
+
+              <div class="text-2xl font-bold mt-2">
+                {{ quantidadeProdutos }}
+              </div>
+            </div>
+
+            <i class="pi pi-box text-3xl"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Ticket médio -->
+      <div class="col-12 md:col-6 lg:col-3">
+        <p-card>
+          <div class="flex justify-content-between align-items-center">
+            <div>
+              <span class="text-500">Ticket médio</span>
+
+              <div class="text-2xl font-bold mt-2">
+                {{ ticketMedio | currency: 'BRL' }}
+              </div>
+            </div>
+
+            <i class="pi pi-chart-line text-3xl"></i>
+          </div>
+        </p-card>
+      </div>
+    </div>
+
+    <!-- Pagamentos -->
+    <div class="grid mt-3">
+      <div class="col-12 lg:col-6">
+        <p-card header="Vendas por forma de pagamento">
+          <div
+            *ngFor="let pagamento of vendasPorPagamento"
+            class="flex justify-content-between align-items-center py-3 border-bottom-1 surface-border"
+          >
+            <span>
+              {{ pagamento.formaPagamento }}
+            </span>
+
+            <strong>
+              {{ pagamento.valor | currency: 'BRL' }}
+            </strong>
+          </div>
+        </p-card>
+      </div>
+
+      <!-- Aqui podemos colocar um gráfico -->
+      <div class="col-12 lg:col-6">
+        <p-card header="Distribuição das vendas">
+          <p-chart type="doughnut" [data]="graficoPagamentos" [options]="graficoOptions"> </p-chart>
+        </p-card>
+      </div>
+    </div>
+  </p-card>
 </div>
