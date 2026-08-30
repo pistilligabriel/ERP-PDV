@@ -4,6 +4,9 @@ import { DashboardService } from '../../../../services/dashboard/dashboard.servi
 import localePt from '@angular/common/locales/pt';
 import { registerLocaleData } from '@angular/common';
 import { Router } from '@angular/router';
+import { Tipo } from '../../../../models/Enum/usuario/Tipo.enum';
+import { Usuario } from '../../../../models/Interfaces/usuario/Usuario.interface';
+import { UsuarioContextService } from '../../../../services/cadastro/usuario/usuario-context.service';
 
 // Registra os dados para o português (o Angular usa 'pt' para abranger o pt-BR)
 registerLocaleData(localePt, 'pt-BR');
@@ -16,6 +19,9 @@ registerLocaleData(localePt, 'pt-BR');
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
+
+    usuario: Usuario | null = null;
+    Tipo = Tipo;
 
   dataInicio: Date = new Date();
   dataFim: Date = new Date();
@@ -51,6 +57,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private dashboardService: DashboardService,
     private cdr: ChangeDetectorRef,
+    private usuarioContext: UsuarioContextService
   ){}
 
   ngOnInit() {
@@ -61,6 +68,16 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.buscarDados();
     this.inicializarConfiguracoesGrafico();
+
+    this.usuarioContext.getUsuario().subscribe({
+      next: (usuario) => {
+        this.usuario = usuario;
+        console.log(this.usuario);
+      },
+      error: (e) => {
+        console.log('Não foi possível obter o usuário logado', e);
+      },
+    });
   }
 
   @HostListener('window:focus')

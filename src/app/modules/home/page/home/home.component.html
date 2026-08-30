@@ -1,7 +1,7 @@
 <app-toolbar-navigation></app-toolbar-navigation>
 
 <div class="p-4">
-  <p-card header="Dashboard de Vendas" styleClass="shadow-3">
+  <p-card *ngIf="usuario?.tipo === Tipo.ADMIN" header="Dashboard de Vendas" styleClass="shadow-3">
     <!-- Filtro -->
     <div class="flex flex-wrap gap-3 align-items-end mb-5">
       <div class="flex flex-column gap-2">
