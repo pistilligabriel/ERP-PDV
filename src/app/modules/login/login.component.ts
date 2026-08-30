@@ -15,11 +15,12 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CookieService } from 'ngx-cookie-service';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, switchMap, takeUntil } from 'rxjs';
 
 import { AuthRequest } from '../../models/Interfaces/usuario/auth/AuthRequest.interface';
 import { UsuarioService } from '../../services/cadastro/usuario/usuario.service';
 import { Usuario } from '../../models/Interfaces/usuario/Usuario.interface';
+import { UsuarioContextService } from '../../services/cadastro/usuario/usuario-context.service';
 
 @Component({
   selector: 'app-login',
@@ -50,7 +51,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private usuarioService: UsuarioService,
     private messageService: MessageService,
     private cookieService: CookieService,
-    private router: Router
+    private router: Router,
+    private usuarioContext: UsuarioContextService
   ) {
     this.selectRole = this.formBuilder.group({
       name: new FormControl(''),
@@ -75,35 +77,36 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit(): void {}
 
   userLogin() {
-    this.usuarioService
-      .loginUser(this.usuarioLogin)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (response) => {
-          if (response) {
-            this.cookieService.set('token', response?.token);
-            this.loginForm.reset();
-            this.router.navigate(['/home']);
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Sucesso',
-              detail: `Bem vindo!`,
-              life: 2000,
-            });
-            console.log(response);
-          }
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Erro',
-            detail: `Erro ao fazer login: ${err.message}`,
-            life: 2000,
-          });
-          console.log(err);
-        },
-      });
-  }
+  this.usuarioService
+    .loginUser(this.usuarioLogin)
+    .pipe(
+      switchMap((response) => {
+        this.cookieService.set('token', response.token);
+        return this.usuarioService.getUsuarioLogado();
+      }),
+      takeUntil(this.destroy$)
+    )
+    .subscribe({
+      next: (usuario) => {
+        console.log('Usuário logado:', usuario);
+
+        this.usuarioContext.setUsuario(usuario);
+
+        this.loginForm.reset();
+        this.router.navigate(['/home']);
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sucesso',
+          detail: 'Bem vindo!',
+          life: 2000,
+        });
+      },
+      error: (erro) => {
+        console.error('Erro durante autenticação:', erro);
+      },
+    });
+}
 
   ngOnDestroy(): void {
     this.destroy$.next();
