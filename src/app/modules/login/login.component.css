@@ -118,6 +118,40 @@
   background-color: #0069d9;
 }
 
+.forgot-password-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -12px;
+  margin-bottom: 8px;
+  margin-right: 8rem;
+}
+
+.forgot-password-button {
+  margin: 0;
+}
+
+/* Estiliza o botão interno do PrimeNG */
+:host ::ng-deep .forgot-password-button .p-button {
+  padding: 2px 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  min-width: auto;
+  height: auto;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+:host ::ng-deep .forgot-password-button .p-button:hover {
+  color: #2563eb;
+  background: transparent;
+}
+
 @media screen and (min-width: 768px) {
   /* Login form */
   .login-form {

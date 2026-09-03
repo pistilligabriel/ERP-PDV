@@ -1,16 +1,74 @@
-<!-- FILEPATH: /D:/Angular/mini-system/src/app/modules/login/login.component.html -->
-
 <!-- Tela de login -->
 <div class="login-container">
-  <h2 class="text-black text-lg font-semibold">Login</h2>
-  <form class="login-form" [formGroup]="loginForm" (ngSubmit)="userLogin()">
+  <h2 class="text-black text-xl font-semibold mb-5">
+    {{ alterarSenha ? 'Alterar senha' : 'Login' }}
+  </h2>
+
+  <form
+    class="login-form"
+    [formGroup]="alterarSenha ? alterarSenhaForm : loginForm"
+    (ngSubmit)="alterarSenha ? alterarPassword() : userLogin()"
+  >
+    <!-- Usuário -->
     <div class="form-group">
-      <input type="text" [(ngModel)]="usuarioLogin.login" pInputText placeholder="Nome" formControlName = "login"/>
+      <input
+        type="text"
+        [(ngModel)]="usuarioLogin.login"
+        pInputText
+        placeholder="Login"
+        formControlName="login"
+      />
     </div>
-    <div class="form-group">
-      <input type="password" [(ngModel)]="usuarioLogin.password" pInputText placeholder="Senha" formControlName = "password"/>
-    </div>
-    <button type="submit" class="btn btn-primary" [disabled]="!this.loginForm.valid">Entrar</button>
+
+    <!-- Campos do login -->
+    <ng-container *ngIf="!alterarSenha">
+      <div class="form-group">
+        <input
+          type="password"
+          [(ngModel)]="usuarioLogin.password"
+          pInputText
+          placeholder="Senha"
+          formControlName="password"
+        />
+      </div>
+
+      <div class="forgot-password-container">
+        <p-button [link]="true" (click)="alterarSenha = true" class="forgot-password-button">
+          Alterar senha
+        </p-button>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="!loginForm.valid">Entrar</button>
+    </ng-container>
+
+    <!-- Campos para alteração de senha -->
+    <ng-container *ngIf="alterarSenha">
+      <div class="form-group">
+        <input type="password" pInputText placeholder="Senha atual" formControlName="password" />
+      </div>
+
+      <div class="form-group">
+        <input type="password" pInputText placeholder="Nova senha" formControlName="newPassword" />
+      </div>
+
+      <div class="form-group">
+        <input
+          type="password"
+          pInputText
+          placeholder="Confirmar nova senha"
+          formControlName="confirmPassword"
+        />
+      </div>
+
+      <div class="flex flex-row gap-3">
+        <button type="submit" class="btn btn-primary" [disabled]="!alterarSenhaForm.valid">
+          Alterar senha
+        </button>
+        <p-button  class="btn btn-primary" severity="secondary" [disabled]="!alterarSenha" (click)="cancelar()">
+          Cancelar
+        </p-button>
+      </div>
+    </ng-container>
   </form>
 </div>
 

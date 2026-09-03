@@ -9,6 +9,7 @@ import { AuthRequest } from "../../../models/Interfaces/usuario/auth/AuthRequest
 import { AuthResponse } from "../../../models/Interfaces/usuario/auth/AuthResponse.interface";
 import { AdicionarUsuario } from "../../../models/Interfaces/usuario/AdicionarUsuario.interface";
 import { EditarUsuario } from "../../../models/Interfaces/usuario/EditarUsuario.interface";
+import { IAlterarSenha } from "../../../models/Interfaces/usuario/auth/IAlterarSenha.interface";
 
 @Injectable({
     providedIn:'root'
@@ -82,6 +83,10 @@ export class UsuarioService{
 
   logoutUser(codigo: bigint): Observable<Usuario> {
     return this.http.patch<Usuario>(`${this.API_URL}/usuarios/logout/${codigo}`, null, this.getHttpOptions());
+  }
+
+  alterarSenha(payload:IAlterarSenha):Observable<{message:string}>{
+    return this.http.post<{message:string}>(`${this.API_URL}/usuarios/alterar-senha`,payload,this.getHttpOptions())
   }
 
   /**

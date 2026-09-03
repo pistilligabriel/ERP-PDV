@@ -21,6 +21,7 @@ import { AuthRequest } from '../../models/Interfaces/usuario/auth/AuthRequest.in
 import { UsuarioService } from '../../services/cadastro/usuario/usuario.service';
 import { Usuario } from '../../models/Interfaces/usuario/Usuario.interface';
 import { UsuarioContextService } from '../../services/cadastro/usuario/usuario-context.service';
+import { IAlterarSenha } from '../../models/Interfaces/usuario/auth/IAlterarSenha.interface';
 
 @Component({
   selector: 'app-login',
@@ -29,9 +30,12 @@ import { UsuarioContextService } from '../../services/cadastro/usuario/usuario-c
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit, OnDestroy {
+
   private destroy$ = new Subject<void>();
 
   loginCard = true;
+
+  alterarSenha:boolean = false;
 
   usuarioLogin: AuthRequest = new AuthRequest();
 
@@ -40,8 +44,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   roles: string[] = ['ADMIN', 'USER'];
 
   public loginForm: FormGroup;
-  public signupForm: FormGroup;
-  public selectRole: FormGroup;
+  public alterarSenhaForm: FormGroup;
 
   @Output() public closeModalEventEmitter: EventEmitter<boolean> =
     new EventEmitter<boolean>();
@@ -54,24 +57,18 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private usuarioContext: UsuarioContextService
   ) {
-    this.selectRole = this.formBuilder.group({
-      name: new FormControl(''),
-    });
 
     this.loginForm = this.formBuilder.group({
       login: new FormControl('', [Validators.required]),
       password: new FormControl('', [Validators.required]),
     });
 
-    this.signupForm = this.formBuilder.group({
-      name: new FormControl('', [Validators.required]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [
-        Validators.required,
-        Validators.minLength(6),
-      ]),
-      role: new FormControl('', [Validators.required]),
-    });
+    this.alterarSenhaForm = this.formBuilder.group({
+      login: ['', [Validators.required]],
+      password: ['',[Validators.required]],
+      newPassword: ['',[Validators.required]],
+      confirmPassword: ['',Validators.required]
+    })
   }
 
   ngOnInit(): void {}
@@ -103,9 +100,56 @@ export class LoginComponent implements OnInit, OnDestroy {
         });
       },
       error: (erro) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erro',
+          detail: erro.error,
+          life: 2000,
+        });
         console.error('Erro durante autenticação:', erro);
       },
     });
+}
+
+alterarPassword(){
+  if(this.alterarSenhaForm.valid){
+    const requestPayload:IAlterarSenha = {
+      login:this.alterarSenhaForm.value.login,
+      password:this.alterarSenhaForm.value.password,
+      newPassword:this.alterarSenhaForm.value.newPassword,
+      confirmPassword:this.alterarSenhaForm.value.confirmPassword,
+    }
+
+    this.usuarioService.alterarSenha(requestPayload)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: (response) => {
+        if(response){
+          this.messageService.add({
+          severity: 'success',
+          summary: 'Alteração de senha',
+          detail: 'Alteração realizada com sucesso',
+          life: 2000,
+        });
+        this.cancelar();
+        }
+      },
+      error: (e) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Alteração de senha',
+          detail: 'Erro ao alterar senha \n'+ e.error,
+          life: 2000,
+        });
+      }
+    })
+  }
+}
+
+
+cancelar() {
+this.alterarSenhaForm.reset();
+this.alterarSenha = false;
 }
 
   ngOnDestroy(): void {
